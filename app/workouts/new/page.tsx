@@ -5,6 +5,20 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import WorkoutTemplateSelector from '@/components/WorkoutTemplateSelector'
 import { WORKOUT_TEMPLATES } from '@/data/workout-templates'
 
+// Helper function to parse template sets and create actual set objects
+function parseTemplateSets(setsString: string) {
+  // Parse strings like "4 sets x 8-12 reps", "3 sets x 10-12 reps", "2 sets to failure"
+  const setMatch = setsString.match(/(\d+)\s+sets?/i)
+  const numberOfSets = setMatch ? parseInt(setMatch[1]) : 3 // Default to 3 sets if can't parse
+  
+  // Create empty sets that user will fill in during workout
+  return Array.from({ length: numberOfSets }, () => ({
+    reps: 0,
+    weight: 0,
+    completed: false
+  }))
+}
+
 function NewWorkoutContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -18,10 +32,10 @@ function NewWorkoutContent() {
     // Find the selected template
     const template = selectedTemplate ? WORKOUT_TEMPLATES.find(t => t.id === selectedTemplate) : null
     
-    // Convert template exercises to workout exercises
+    // Convert template exercises to workout exercises with pre-created sets
     const exercises = template ? template.exercises.map((exercise, index) => ({
       name: exercise.name,
-      sets: [] // Will be populated during workout
+      sets: parseTemplateSets(exercise.sets) // Parse template sets and create actual set objects
     })) : []
     
     const workoutData = {
@@ -119,16 +133,19 @@ function NewWorkoutContent() {
                       Exercises included:
                     </p>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                      {template.exercises.map((exercise, index) => (
-                        <div key={index} className="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-700 rounded">
-                          <span className="text-sm text-gray-700 dark:text-gray-300">
-                            {exercise.name}
-                          </span>
-                          <span className="text-xs text-gray-500 dark:text-gray-400">
-                            {exercise.sets}
-                          </span>
-                        </div>
-                      ))}
+                      {template.exercises.map((exercise, index) => {
+                        const setCount = parseTemplateSets(exercise.sets).length
+                        return (
+                          <div key={index} className="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-700 rounded">
+                            <span className="text-sm text-gray-700 dark:text-gray-300">
+                              {exercise.name}
+                            </span>
+                            <span className="text-xs text-gray-500 dark:text-gray-400">
+                              {setCount} sets ({exercise.sets})
+                            </span>
+                          </div>
+                        )
+                      })}
                     </div>
                   </div>
                 </div>
