@@ -1,10 +1,10 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import WorkoutTemplateSelector from '@/components/WorkoutTemplateSelector'
 
-export default function NewWorkoutPage() {
+function NewWorkoutContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const isQuickStart = searchParams.get('quick') === 'true'
@@ -91,5 +91,13 @@ export default function NewWorkoutPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function NewWorkoutPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <NewWorkoutContent />
+    </Suspense>
   )
 }

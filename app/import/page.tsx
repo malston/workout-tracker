@@ -279,7 +279,6 @@ export default function ImportPage() {
                 <div className="flex gap-4 mt-4">
                   <Button
                     onClick={() => router.push(importType === 'exercise' ? '/exercises' : '/workouts')}
-                    variant="primary"
                   >
                     View {importType === 'exercise' ? 'Exercises' : 'Workouts'}
                   </Button>
