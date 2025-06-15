@@ -3,22 +3,34 @@
 import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import WorkoutTemplateSelector from '@/components/WorkoutTemplateSelector'
+import { WORKOUT_TEMPLATES } from '@/data/workout-templates'
 
 function NewWorkoutContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const isQuickStart = searchParams.get('quick') === 'true'
+  const templateFromUrl = searchParams.get('template')
   
   const [workoutName, setWorkoutName] = useState('')
-  const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null)
+  const [selectedTemplate, setSelectedTemplate] = useState<string | null>(templateFromUrl)
 
   const startWorkout = () => {
+    // Find the selected template
+    const template = selectedTemplate ? WORKOUT_TEMPLATES.find(t => t.id === selectedTemplate) : null
+    
+    // Convert template exercises to workout exercises
+    const exercises = template ? template.exercises.map((exercise, index) => ({
+      name: exercise.name,
+      sets: [] // Will be populated during workout
+    })) : []
+    
     const workoutData = {
       id: Date.now().toString(),
-      name: workoutName || (selectedTemplate ? `${selectedTemplate} Workout` : 'Custom Workout'),
+      name: workoutName || (template ? `${template.name} Workout` : 'Custom Workout'),
       template: selectedTemplate,
+      templateName: template?.name || null,
       startTime: new Date().toISOString(),
-      exercises: []
+      exercises: exercises
     }
     
     // Save to session storage for active workout
@@ -75,12 +87,62 @@ function NewWorkoutContent() {
           />
         </div>
 
+        {/* Template Preview */}
+        {selectedTemplate && (
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-6">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+              Workout Preview
+            </h3>
+            {(() => {
+              const template = WORKOUT_TEMPLATES.find(t => t.id === selectedTemplate)
+              if (!template) return null
+              
+              return (
+                <div>
+                  <div className="flex items-center justify-between mb-4">
+                    <h4 className="text-md font-medium text-gray-800 dark:text-gray-200">
+                      {template.emoji} {template.name}
+                    </h4>
+                    <div className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400">
+                      <span>{template.difficulty}</span>
+                      <span>•</span>
+                      <span>{template.duration}</span>
+                      <span>•</span>
+                      <span>{template.exercises.length} exercises</span>
+                    </div>
+                  </div>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                    {template.description}
+                  </p>
+                  <div className="space-y-2">
+                    <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                      Exercises included:
+                    </p>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                      {template.exercises.map((exercise, index) => (
+                        <div key={index} className="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-700 rounded">
+                          <span className="text-sm text-gray-700 dark:text-gray-300">
+                            {exercise.name}
+                          </span>
+                          <span className="text-xs text-gray-500 dark:text-gray-400">
+                            {exercise.sets}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )
+            })()}
+          </div>
+        )}
+
         <div className="flex gap-4">
           <button
             onClick={startWorkout}
             className="flex-1 bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold text-lg transition-colors"
           >
-            Start Workout
+            {selectedTemplate ? 'Start Template Workout' : 'Start Custom Workout'}
           </button>
           <button
             onClick={() => router.back()}
