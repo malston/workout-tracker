@@ -54,10 +54,7 @@ export default function ImportPage() {
       const formData = new FormData();
       formData.append('file', selectedFile);
 
-      if (importType === 'workout') {
-        // For now, use a default user ID - in a real app, this would come from authentication
-        formData.append('userId', 'default-user-id');
-      }
+      // No user ID needed for now since we don't have authentication
 
       const response = await fetch(`/api/import/${importType}s`, {
         method: 'POST',

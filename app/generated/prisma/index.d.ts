@@ -2576,7 +2576,7 @@ export namespace Prisma {
     name: string
     date: Date
     notes: string | null
-    userId: string
+    userId: string | null
     createdAt: Date
     updatedAt: Date
     _count: WorkoutCountAggregateOutputType | null
@@ -2606,7 +2606,7 @@ export namespace Prisma {
     userId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
-    user?: boolean | UserDefaultArgs<ExtArgs>
+    user?: boolean | Workout$userArgs<ExtArgs>
     exercises?: boolean | Workout$exercisesArgs<ExtArgs>
     _count?: boolean | WorkoutCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["workout"]>
@@ -2619,7 +2619,7 @@ export namespace Prisma {
     userId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
-    user?: boolean | UserDefaultArgs<ExtArgs>
+    user?: boolean | Workout$userArgs<ExtArgs>
   }, ExtArgs["result"]["workout"]>
 
   export type WorkoutSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -2630,7 +2630,7 @@ export namespace Prisma {
     userId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
-    user?: boolean | UserDefaultArgs<ExtArgs>
+    user?: boolean | Workout$userArgs<ExtArgs>
   }, ExtArgs["result"]["workout"]>
 
   export type WorkoutSelectScalar = {
@@ -2645,21 +2645,21 @@ export namespace Prisma {
 
   export type WorkoutOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "date" | "notes" | "userId" | "createdAt" | "updatedAt", ExtArgs["result"]["workout"]>
   export type WorkoutInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    user?: boolean | UserDefaultArgs<ExtArgs>
+    user?: boolean | Workout$userArgs<ExtArgs>
     exercises?: boolean | Workout$exercisesArgs<ExtArgs>
     _count?: boolean | WorkoutCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type WorkoutIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    user?: boolean | UserDefaultArgs<ExtArgs>
+    user?: boolean | Workout$userArgs<ExtArgs>
   }
   export type WorkoutIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    user?: boolean | UserDefaultArgs<ExtArgs>
+    user?: boolean | Workout$userArgs<ExtArgs>
   }
 
   export type $WorkoutPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "Workout"
     objects: {
-      user: Prisma.$UserPayload<ExtArgs>
+      user: Prisma.$UserPayload<ExtArgs> | null
       exercises: Prisma.$WorkoutExercisePayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
@@ -2667,7 +2667,7 @@ export namespace Prisma {
       name: string
       date: Date
       notes: string | null
-      userId: string
+      userId: string | null
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["workout"]>
@@ -3064,7 +3064,7 @@ export namespace Prisma {
    */
   export interface Prisma__WorkoutClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
-    user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    user<T extends Workout$userArgs<ExtArgs> = {}>(args?: Subset<T, Workout$userArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     exercises<T extends Workout$exercisesArgs<ExtArgs> = {}>(args?: Subset<T, Workout$exercisesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$WorkoutExercisePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -3498,6 +3498,25 @@ export namespace Prisma {
   }
 
   /**
+   * Workout.user
+   */
+  export type Workout$userArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the User
+     */
+    select?: UserSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the User
+     */
+    omit?: UserOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
+    where?: UserWhereInput
+  }
+
+  /**
    * Workout.exercises
    */
   export type Workout$exercisesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -3554,6 +3573,10 @@ export namespace Prisma {
     id: string | null
     name: string | null
     category: string | null
+    equipment: string | null
+    difficulty: string | null
+    instructions: string | null
+    notes: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -3562,6 +3585,10 @@ export namespace Prisma {
     id: string | null
     name: string | null
     category: string | null
+    equipment: string | null
+    difficulty: string | null
+    instructions: string | null
+    notes: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -3571,6 +3598,10 @@ export namespace Prisma {
     name: number
     category: number
     muscleGroup: number
+    equipment: number
+    difficulty: number
+    instructions: number
+    notes: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -3581,6 +3612,10 @@ export namespace Prisma {
     id?: true
     name?: true
     category?: true
+    equipment?: true
+    difficulty?: true
+    instructions?: true
+    notes?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -3589,6 +3624,10 @@ export namespace Prisma {
     id?: true
     name?: true
     category?: true
+    equipment?: true
+    difficulty?: true
+    instructions?: true
+    notes?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -3598,6 +3637,10 @@ export namespace Prisma {
     name?: true
     category?: true
     muscleGroup?: true
+    equipment?: true
+    difficulty?: true
+    instructions?: true
+    notes?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -3680,6 +3723,10 @@ export namespace Prisma {
     name: string
     category: string
     muscleGroup: string[]
+    equipment: string | null
+    difficulty: string | null
+    instructions: string | null
+    notes: string | null
     createdAt: Date
     updatedAt: Date
     _count: ExerciseCountAggregateOutputType | null
@@ -3706,6 +3753,10 @@ export namespace Prisma {
     name?: boolean
     category?: boolean
     muscleGroup?: boolean
+    equipment?: boolean
+    difficulty?: boolean
+    instructions?: boolean
+    notes?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     workoutExercises?: boolean | Exercise$workoutExercisesArgs<ExtArgs>
@@ -3717,6 +3768,10 @@ export namespace Prisma {
     name?: boolean
     category?: boolean
     muscleGroup?: boolean
+    equipment?: boolean
+    difficulty?: boolean
+    instructions?: boolean
+    notes?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }, ExtArgs["result"]["exercise"]>
@@ -3726,6 +3781,10 @@ export namespace Prisma {
     name?: boolean
     category?: boolean
     muscleGroup?: boolean
+    equipment?: boolean
+    difficulty?: boolean
+    instructions?: boolean
+    notes?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }, ExtArgs["result"]["exercise"]>
@@ -3735,11 +3794,15 @@ export namespace Prisma {
     name?: boolean
     category?: boolean
     muscleGroup?: boolean
+    equipment?: boolean
+    difficulty?: boolean
+    instructions?: boolean
+    notes?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type ExerciseOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "category" | "muscleGroup" | "createdAt" | "updatedAt", ExtArgs["result"]["exercise"]>
+  export type ExerciseOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "category" | "muscleGroup" | "equipment" | "difficulty" | "instructions" | "notes" | "createdAt" | "updatedAt", ExtArgs["result"]["exercise"]>
   export type ExerciseInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     workoutExercises?: boolean | Exercise$workoutExercisesArgs<ExtArgs>
     _count?: boolean | ExerciseCountOutputTypeDefaultArgs<ExtArgs>
@@ -3757,6 +3820,10 @@ export namespace Prisma {
       name: string
       category: string
       muscleGroup: string[]
+      equipment: string | null
+      difficulty: string | null
+      instructions: string | null
+      notes: string | null
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["exercise"]>
@@ -4187,6 +4254,10 @@ export namespace Prisma {
     readonly name: FieldRef<"Exercise", 'String'>
     readonly category: FieldRef<"Exercise", 'String'>
     readonly muscleGroup: FieldRef<"Exercise", 'String[]'>
+    readonly equipment: FieldRef<"Exercise", 'String'>
+    readonly difficulty: FieldRef<"Exercise", 'String'>
+    readonly instructions: FieldRef<"Exercise", 'String'>
+    readonly notes: FieldRef<"Exercise", 'String'>
     readonly createdAt: FieldRef<"Exercise", 'DateTime'>
     readonly updatedAt: FieldRef<"Exercise", 'DateTime'>
   }
@@ -6978,6 +7049,10 @@ export namespace Prisma {
     name: 'name',
     category: 'category',
     muscleGroup: 'muscleGroup',
+    equipment: 'equipment',
+    difficulty: 'difficulty',
+    instructions: 'instructions',
+    notes: 'notes',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -7164,10 +7239,10 @@ export namespace Prisma {
     name?: StringFilter<"Workout"> | string
     date?: DateTimeFilter<"Workout"> | Date | string
     notes?: StringNullableFilter<"Workout"> | string | null
-    userId?: StringFilter<"Workout"> | string
+    userId?: StringNullableFilter<"Workout"> | string | null
     createdAt?: DateTimeFilter<"Workout"> | Date | string
     updatedAt?: DateTimeFilter<"Workout"> | Date | string
-    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+    user?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
     exercises?: WorkoutExerciseListRelationFilter
   }
 
@@ -7176,7 +7251,7 @@ export namespace Prisma {
     name?: SortOrder
     date?: SortOrder
     notes?: SortOrderInput | SortOrder
-    userId?: SortOrder
+    userId?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     user?: UserOrderByWithRelationInput
@@ -7191,10 +7266,10 @@ export namespace Prisma {
     name?: StringFilter<"Workout"> | string
     date?: DateTimeFilter<"Workout"> | Date | string
     notes?: StringNullableFilter<"Workout"> | string | null
-    userId?: StringFilter<"Workout"> | string
+    userId?: StringNullableFilter<"Workout"> | string | null
     createdAt?: DateTimeFilter<"Workout"> | Date | string
     updatedAt?: DateTimeFilter<"Workout"> | Date | string
-    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+    user?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
     exercises?: WorkoutExerciseListRelationFilter
   }, "id">
 
@@ -7203,7 +7278,7 @@ export namespace Prisma {
     name?: SortOrder
     date?: SortOrder
     notes?: SortOrderInput | SortOrder
-    userId?: SortOrder
+    userId?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: WorkoutCountOrderByAggregateInput
@@ -7219,7 +7294,7 @@ export namespace Prisma {
     name?: StringWithAggregatesFilter<"Workout"> | string
     date?: DateTimeWithAggregatesFilter<"Workout"> | Date | string
     notes?: StringNullableWithAggregatesFilter<"Workout"> | string | null
-    userId?: StringWithAggregatesFilter<"Workout"> | string
+    userId?: StringNullableWithAggregatesFilter<"Workout"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"Workout"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Workout"> | Date | string
   }
@@ -7232,6 +7307,10 @@ export namespace Prisma {
     name?: StringFilter<"Exercise"> | string
     category?: StringFilter<"Exercise"> | string
     muscleGroup?: StringNullableListFilter<"Exercise">
+    equipment?: StringNullableFilter<"Exercise"> | string | null
+    difficulty?: StringNullableFilter<"Exercise"> | string | null
+    instructions?: StringNullableFilter<"Exercise"> | string | null
+    notes?: StringNullableFilter<"Exercise"> | string | null
     createdAt?: DateTimeFilter<"Exercise"> | Date | string
     updatedAt?: DateTimeFilter<"Exercise"> | Date | string
     workoutExercises?: WorkoutExerciseListRelationFilter
@@ -7242,6 +7321,10 @@ export namespace Prisma {
     name?: SortOrder
     category?: SortOrder
     muscleGroup?: SortOrder
+    equipment?: SortOrderInput | SortOrder
+    difficulty?: SortOrderInput | SortOrder
+    instructions?: SortOrderInput | SortOrder
+    notes?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     workoutExercises?: WorkoutExerciseOrderByRelationAggregateInput
@@ -7255,6 +7338,10 @@ export namespace Prisma {
     NOT?: ExerciseWhereInput | ExerciseWhereInput[]
     category?: StringFilter<"Exercise"> | string
     muscleGroup?: StringNullableListFilter<"Exercise">
+    equipment?: StringNullableFilter<"Exercise"> | string | null
+    difficulty?: StringNullableFilter<"Exercise"> | string | null
+    instructions?: StringNullableFilter<"Exercise"> | string | null
+    notes?: StringNullableFilter<"Exercise"> | string | null
     createdAt?: DateTimeFilter<"Exercise"> | Date | string
     updatedAt?: DateTimeFilter<"Exercise"> | Date | string
     workoutExercises?: WorkoutExerciseListRelationFilter
@@ -7265,6 +7352,10 @@ export namespace Prisma {
     name?: SortOrder
     category?: SortOrder
     muscleGroup?: SortOrder
+    equipment?: SortOrderInput | SortOrder
+    difficulty?: SortOrderInput | SortOrder
+    instructions?: SortOrderInput | SortOrder
+    notes?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: ExerciseCountOrderByAggregateInput
@@ -7280,6 +7371,10 @@ export namespace Prisma {
     name?: StringWithAggregatesFilter<"Exercise"> | string
     category?: StringWithAggregatesFilter<"Exercise"> | string
     muscleGroup?: StringNullableListFilter<"Exercise">
+    equipment?: StringNullableWithAggregatesFilter<"Exercise"> | string | null
+    difficulty?: StringNullableWithAggregatesFilter<"Exercise"> | string | null
+    instructions?: StringNullableWithAggregatesFilter<"Exercise"> | string | null
+    notes?: StringNullableWithAggregatesFilter<"Exercise"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"Exercise"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Exercise"> | Date | string
   }
@@ -7503,7 +7598,7 @@ export namespace Prisma {
     notes?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    user: UserCreateNestedOneWithoutWorkoutsInput
+    user?: UserCreateNestedOneWithoutWorkoutsInput
     exercises?: WorkoutExerciseCreateNestedManyWithoutWorkoutInput
   }
 
@@ -7512,7 +7607,7 @@ export namespace Prisma {
     name: string
     date: Date | string
     notes?: string | null
-    userId: string
+    userId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     exercises?: WorkoutExerciseUncheckedCreateNestedManyWithoutWorkoutInput
@@ -7525,7 +7620,7 @@ export namespace Prisma {
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    user?: UserUpdateOneRequiredWithoutWorkoutsNestedInput
+    user?: UserUpdateOneWithoutWorkoutsNestedInput
     exercises?: WorkoutExerciseUpdateManyWithoutWorkoutNestedInput
   }
 
@@ -7534,7 +7629,7 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     date?: DateTimeFieldUpdateOperationsInput | Date | string
     notes?: NullableStringFieldUpdateOperationsInput | string | null
-    userId?: StringFieldUpdateOperationsInput | string
+    userId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     exercises?: WorkoutExerciseUncheckedUpdateManyWithoutWorkoutNestedInput
@@ -7545,7 +7640,7 @@ export namespace Prisma {
     name: string
     date: Date | string
     notes?: string | null
-    userId: string
+    userId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -7564,7 +7659,7 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     date?: DateTimeFieldUpdateOperationsInput | Date | string
     notes?: NullableStringFieldUpdateOperationsInput | string | null
-    userId?: StringFieldUpdateOperationsInput | string
+    userId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -7574,6 +7669,10 @@ export namespace Prisma {
     name: string
     category: string
     muscleGroup?: ExerciseCreatemuscleGroupInput | string[]
+    equipment?: string | null
+    difficulty?: string | null
+    instructions?: string | null
+    notes?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     workoutExercises?: WorkoutExerciseCreateNestedManyWithoutExerciseInput
@@ -7584,6 +7683,10 @@ export namespace Prisma {
     name: string
     category: string
     muscleGroup?: ExerciseCreatemuscleGroupInput | string[]
+    equipment?: string | null
+    difficulty?: string | null
+    instructions?: string | null
+    notes?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     workoutExercises?: WorkoutExerciseUncheckedCreateNestedManyWithoutExerciseInput
@@ -7594,6 +7697,10 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     category?: StringFieldUpdateOperationsInput | string
     muscleGroup?: ExerciseUpdatemuscleGroupInput | string[]
+    equipment?: NullableStringFieldUpdateOperationsInput | string | null
+    difficulty?: NullableStringFieldUpdateOperationsInput | string | null
+    instructions?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     workoutExercises?: WorkoutExerciseUpdateManyWithoutExerciseNestedInput
@@ -7604,6 +7711,10 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     category?: StringFieldUpdateOperationsInput | string
     muscleGroup?: ExerciseUpdatemuscleGroupInput | string[]
+    equipment?: NullableStringFieldUpdateOperationsInput | string | null
+    difficulty?: NullableStringFieldUpdateOperationsInput | string | null
+    instructions?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     workoutExercises?: WorkoutExerciseUncheckedUpdateManyWithoutExerciseNestedInput
@@ -7614,6 +7725,10 @@ export namespace Prisma {
     name: string
     category: string
     muscleGroup?: ExerciseCreatemuscleGroupInput | string[]
+    equipment?: string | null
+    difficulty?: string | null
+    instructions?: string | null
+    notes?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -7623,6 +7738,10 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     category?: StringFieldUpdateOperationsInput | string
     muscleGroup?: ExerciseUpdatemuscleGroupInput | string[]
+    equipment?: NullableStringFieldUpdateOperationsInput | string | null
+    difficulty?: NullableStringFieldUpdateOperationsInput | string | null
+    instructions?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -7632,6 +7751,10 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     category?: StringFieldUpdateOperationsInput | string
     muscleGroup?: ExerciseUpdatemuscleGroupInput | string[]
+    equipment?: NullableStringFieldUpdateOperationsInput | string | null
+    difficulty?: NullableStringFieldUpdateOperationsInput | string | null
+    instructions?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -7921,9 +8044,9 @@ export namespace Prisma {
     _max?: NestedDateTimeFilter<$PrismaModel>
   }
 
-  export type UserScalarRelationFilter = {
-    is?: UserWhereInput
-    isNot?: UserWhereInput
+  export type UserNullableScalarRelationFilter = {
+    is?: UserWhereInput | null
+    isNot?: UserWhereInput | null
   }
 
   export type WorkoutExerciseListRelationFilter = {
@@ -7979,6 +8102,10 @@ export namespace Prisma {
     name?: SortOrder
     category?: SortOrder
     muscleGroup?: SortOrder
+    equipment?: SortOrder
+    difficulty?: SortOrder
+    instructions?: SortOrder
+    notes?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -7987,6 +8114,10 @@ export namespace Prisma {
     id?: SortOrder
     name?: SortOrder
     category?: SortOrder
+    equipment?: SortOrder
+    difficulty?: SortOrder
+    instructions?: SortOrder
+    notes?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -7995,6 +8126,10 @@ export namespace Prisma {
     id?: SortOrder
     name?: SortOrder
     category?: SortOrder
+    equipment?: SortOrder
+    difficulty?: SortOrder
+    instructions?: SortOrder
+    notes?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -8280,10 +8415,12 @@ export namespace Prisma {
     connect?: WorkoutExerciseWhereUniqueInput | WorkoutExerciseWhereUniqueInput[]
   }
 
-  export type UserUpdateOneRequiredWithoutWorkoutsNestedInput = {
+  export type UserUpdateOneWithoutWorkoutsNestedInput = {
     create?: XOR<UserCreateWithoutWorkoutsInput, UserUncheckedCreateWithoutWorkoutsInput>
     connectOrCreate?: UserCreateOrConnectWithoutWorkoutsInput
     upsert?: UserUpsertWithoutWorkoutsInput
+    disconnect?: UserWhereInput | boolean
+    delete?: UserWhereInput | boolean
     connect?: UserWhereUniqueInput
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutWorkoutsInput, UserUpdateWithoutWorkoutsInput>, UserUncheckedUpdateWithoutWorkoutsInput>
   }
@@ -8708,7 +8845,7 @@ export namespace Prisma {
     name?: StringFilter<"Workout"> | string
     date?: DateTimeFilter<"Workout"> | Date | string
     notes?: StringNullableFilter<"Workout"> | string | null
-    userId?: StringFilter<"Workout"> | string
+    userId?: StringNullableFilter<"Workout"> | string | null
     createdAt?: DateTimeFilter<"Workout"> | Date | string
     updatedAt?: DateTimeFilter<"Workout"> | Date | string
   }
@@ -8868,7 +9005,7 @@ export namespace Prisma {
     notes?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    user: UserCreateNestedOneWithoutWorkoutsInput
+    user?: UserCreateNestedOneWithoutWorkoutsInput
   }
 
   export type WorkoutUncheckedCreateWithoutExercisesInput = {
@@ -8876,7 +9013,7 @@ export namespace Prisma {
     name: string
     date: Date | string
     notes?: string | null
-    userId: string
+    userId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -8891,6 +9028,10 @@ export namespace Prisma {
     name: string
     category: string
     muscleGroup?: ExerciseCreatemuscleGroupInput | string[]
+    equipment?: string | null
+    difficulty?: string | null
+    instructions?: string | null
+    notes?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -8900,6 +9041,10 @@ export namespace Prisma {
     name: string
     category: string
     muscleGroup?: ExerciseCreatemuscleGroupInput | string[]
+    equipment?: string | null
+    difficulty?: string | null
+    instructions?: string | null
+    notes?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -8961,7 +9106,7 @@ export namespace Prisma {
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    user?: UserUpdateOneRequiredWithoutWorkoutsNestedInput
+    user?: UserUpdateOneWithoutWorkoutsNestedInput
   }
 
   export type WorkoutUncheckedUpdateWithoutExercisesInput = {
@@ -8969,7 +9114,7 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     date?: DateTimeFieldUpdateOperationsInput | Date | string
     notes?: NullableStringFieldUpdateOperationsInput | string | null
-    userId?: StringFieldUpdateOperationsInput | string
+    userId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -8990,6 +9135,10 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     category?: StringFieldUpdateOperationsInput | string
     muscleGroup?: ExerciseUpdatemuscleGroupInput | string[]
+    equipment?: NullableStringFieldUpdateOperationsInput | string | null
+    difficulty?: NullableStringFieldUpdateOperationsInput | string | null
+    instructions?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -8999,6 +9148,10 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     category?: StringFieldUpdateOperationsInput | string
     muscleGroup?: ExerciseUpdatemuscleGroupInput | string[]
+    equipment?: NullableStringFieldUpdateOperationsInput | string | null
+    difficulty?: NullableStringFieldUpdateOperationsInput | string | null
+    instructions?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }

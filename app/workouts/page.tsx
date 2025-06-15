@@ -1,30 +1,12 @@
 'use client'
 
-import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { useWorkouts } from '@/hooks/useWorkouts'
 import WorkoutCard from '@/components/WorkoutCard'
-
-interface Workout {
-  id: string
-  name: string
-  date: string
-  duration: number
-  exercises: number
-  totalVolume: number
-}
+import { LoadingSpinner } from '@/components'
 
 export default function WorkoutsPage() {
-  const [workouts, setWorkouts] = useState<Workout[]>([])
-  const [isLoading, setIsLoading] = useState(true)
-
-  useEffect(() => {
-    // Load workouts from localStorage
-    const savedWorkouts = localStorage.getItem('workouts')
-    if (savedWorkouts) {
-      setWorkouts(JSON.parse(savedWorkouts))
-    }
-    setIsLoading(false)
-  }, [])
+  const { workouts, loading, error } = useWorkouts()
 
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900">
@@ -57,20 +39,55 @@ export default function WorkoutsPage() {
             Recent Workouts
           </h2>
           
-          {isLoading ? (
+          {error && (
+            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 rounded-lg p-4 mb-4">
+              <p className="text-red-600 dark:text-red-400">
+                Error loading workouts: {error}
+              </p>
+            </div>
+          )}
+          
+          {loading ? (
             <div className="text-center py-8">
-              <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 dark:border-white"></div>
+              <LoadingSpinner size="lg" />
             </div>
           ) : workouts.length === 0 ? (
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-8 text-center">
-              <p className="text-gray-500 dark:text-gray-400 text-lg">
-                No workouts yet. Start your first workout!
+              <div className="text-6xl mb-4">🏋️</div>
+              <h3 className="text-xl font-semibold mb-2">No workouts yet!</h3>
+              <p className="text-gray-500 dark:text-gray-400 text-lg mb-6">
+                Start your fitness journey by creating your first workout.
               </p>
+              <div className="space-y-3">
+                <Link
+                  href="/workouts/new"
+                  className="inline-block bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
+                >
+                  Create Your First Workout
+                </Link>
+                <div className="text-gray-400">or</div>
+                <Link
+                  href="/import"
+                  className="inline-block text-blue-500 hover:text-blue-600 underline"
+                >
+                  Import existing workout data
+                </Link>
+              </div>
             </div>
           ) : (
             <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
               {workouts.map((workout) => (
-                <WorkoutCard key={workout.id} workout={workout} />
+                <WorkoutCard 
+                  key={workout.id} 
+                  workout={{
+                    id: workout.id,
+                    name: workout.name,
+                    date: workout.date.toString(),
+                    duration: 0, // Will be calculated from exercises
+                    exercises: workout.exercises.length,
+                    totalVolume: 0 // Will be calculated from sets
+                  }} 
+                />
               ))}
             </div>
           )}

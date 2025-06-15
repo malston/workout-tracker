@@ -143,6 +143,10 @@ exports.Prisma.ExerciseScalarFieldEnum = {
   name: 'name',
   category: 'category',
   muscleGroup: 'muscleGroup',
+  equipment: 'equipment',
+  difficulty: 'difficulty',
+  instructions: 'instructions',
+  notes: 'notes',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };

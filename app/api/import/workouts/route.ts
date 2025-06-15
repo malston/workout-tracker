@@ -17,23 +17,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (!userId) {
-      return NextResponse.json(
-        { error: 'User ID is required' },
-        { status: 400 }
-      );
-    }
-
-    // Verify user exists
-    const user = await prisma.user.findUnique({
-      where: { id: userId }
-    });
-
-    if (!user) {
-      return NextResponse.json(
-        { error: 'User not found' },
-        { status: 404 }
-      );
+    // User ID is optional - if provided, verify it exists
+    let userExists = false;
+    if (userId) {
+      const user = await prisma.user.findUnique({
+        where: { id: userId }
+      });
+      userExists = !!user;
     }
 
     // Detect file type
@@ -80,7 +70,7 @@ export async function POST(request: NextRequest) {
               name: workout.name,
               date: workout.date instanceof Date ? workout.date : new Date(workout.date),
               notes: workout.notes,
-              userId: userId
+              userId: userExists ? userId : null
             }
           });
 
