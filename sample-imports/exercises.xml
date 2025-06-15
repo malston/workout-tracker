@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<exercises>
+  <exercise>
+    <name>Bench Press</name>
+    <category>strength</category>
+    <muscleGroup>
+      <muscle>chest</muscle>
+      <muscle>triceps</muscle>
+      <muscle>shoulders</muscle>
+    </muscleGroup>
+    <notes>Classic compound chest exercise</notes>
+  </exercise>
+  <exercise>
+    <name>Squats</name>
+    <category>strength</category>
+    <muscleGroup>
+      <muscle>quadriceps</muscle>
+      <muscle>glutes</muscle>
+      <muscle>hamstrings</muscle>
+      <muscle>core</muscle>
+    </muscleGroup>
+    <notes>King of leg exercises</notes>
+  </exercise>
+  <exercise>
+    <name>Running</name>
+    <category>cardio</category>
+    <muscleGroup>
+      <muscle>full body</muscle>
+    </muscleGroup>
+    <notes>Great for cardiovascular fitness</notes>
+  </exercise>
+  <exercise>
+    <name>Yoga</name>
+    <category>flexibility</category>
+    <muscleGroup>
+      <muscle>full body</muscle>
+    </muscleGroup>
+    <notes>Improves flexibility and balance</notes>
+  </exercise>
+  <exercise>
+    <name>Basketball</name>
+    <category>sports</category>
+    <muscleGroup>
+      <muscle>full body</muscle>
+    </muscleGroup>
+    <notes>Team sport with cardio and agility</notes>
+  </exercise>
+</exercises>

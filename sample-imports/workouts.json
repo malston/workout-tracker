@@ -1,0 +1,59 @@
+[
+  {
+    "name": "Monday Upper Body",
+    "date": "2024-01-15",
+    "notes": "Great workout, feeling strong",
+    "exercises": [
+      {
+        "exerciseName": "Bench Press",
+        "order": 0,
+        "sets": [
+          { "setNumber": 1, "reps": 12, "weight": 135, "notes": "Warmup" },
+          { "setNumber": 2, "reps": 10, "weight": 155 },
+          { "setNumber": 3, "reps": 8, "weight": 175 },
+          { "setNumber": 4, "reps": 6, "weight": 185, "notes": "Max effort" }
+        ]
+      },
+      {
+        "exerciseName": "Pull-ups",
+        "order": 1,
+        "sets": [
+          { "setNumber": 1, "reps": 10 },
+          { "setNumber": 2, "reps": 8 },
+          { "setNumber": 3, "reps": 6, "notes": "Used assistance" }
+        ]
+      },
+      {
+        "exerciseName": "Bicep Curls",
+        "order": 2,
+        "sets": [
+          { "setNumber": 1, "reps": 12, "weight": 30 },
+          { "setNumber": 2, "reps": 10, "weight": 35 },
+          { "setNumber": 3, "reps": 8, "weight": 40 }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Tuesday Cardio Session",
+    "date": "2024-01-16",
+    "notes": "Morning cardio workout",
+    "exercises": [
+      {
+        "exerciseName": "Running",
+        "order": 0,
+        "sets": [
+          { "setNumber": 1, "duration": 30, "distance": 5, "notes": "Steady pace" },
+          { "setNumber": 2, "duration": 15, "distance": 2.5, "notes": "Cool down" }
+        ]
+      },
+      {
+        "exerciseName": "Cycling",
+        "order": 1,
+        "sets": [
+          { "setNumber": 1, "duration": 20, "distance": 8, "notes": "High intensity" }
+        ]
+      }
+    ]
+  }
+]

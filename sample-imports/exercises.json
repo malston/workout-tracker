@@ -1,0 +1,50 @@
+[
+  {
+    "name": "Bench Press",
+    "category": "strength",
+    "muscleGroup": ["chest", "triceps", "shoulders"],
+    "notes": "Classic compound chest exercise"
+  },
+  {
+    "name": "Squats",
+    "category": "strength",
+    "muscleGroup": ["quadriceps", "glutes", "hamstrings", "core"],
+    "notes": "King of leg exercises"
+  },
+  {
+    "name": "Deadlifts",
+    "category": "strength",
+    "muscleGroup": ["back", "glutes", "hamstrings", "core"],
+    "notes": "Full body power movement"
+  },
+  {
+    "name": "Pull-ups",
+    "category": "strength",
+    "muscleGroup": ["back", "biceps", "core"],
+    "notes": "Bodyweight back exercise"
+  },
+  {
+    "name": "Running",
+    "category": "cardio",
+    "muscleGroup": ["full body"],
+    "notes": "Great for cardiovascular fitness"
+  },
+  {
+    "name": "Yoga",
+    "category": "flexibility",
+    "muscleGroup": ["full body"],
+    "notes": "Improves flexibility and balance"
+  },
+  {
+    "name": "Basketball",
+    "category": "sports",
+    "muscleGroup": ["full body"],
+    "notes": "Team sport with cardio and agility"
+  },
+  {
+    "name": "Balance Board",
+    "category": "balance",
+    "muscleGroup": ["core", "lower body"],
+    "notes": "Improves balance and stability"
+  }
+]

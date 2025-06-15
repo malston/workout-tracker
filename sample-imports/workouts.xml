@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<workouts>
+  <workout>
+    <name>Monday Upper Body</name>
+    <date>2024-01-15</date>
+    <notes>Great workout, feeling strong</notes>
+    <exercises>
+      <exercise>
+        <exerciseName>Bench Press</exerciseName>
+        <order>0</order>
+        <sets>
+          <set>
+            <setNumber>1</setNumber>
+            <reps>12</reps>
+            <weight>135</weight>
+            <notes>Warmup</notes>
+          </set>
+          <set>
+            <setNumber>2</setNumber>
+            <reps>10</reps>
+            <weight>155</weight>
+          </set>
+          <set>
+            <setNumber>3</setNumber>
+            <reps>8</reps>
+            <weight>175</weight>
+          </set>
+        </sets>
+      </exercise>
+      <exercise>
+        <exerciseName>Pull-ups</exerciseName>
+        <order>1</order>
+        <sets>
+          <set>
+            <setNumber>1</setNumber>
+            <reps>10</reps>
+          </set>
+          <set>
+            <setNumber>2</setNumber>
+            <reps>8</reps>
+          </set>
+        </sets>
+      </exercise>
+    </exercises>
+  </workout>
+  <workout>
+    <name>Tuesday Cardio</name>
+    <date>2024-01-16</date>
+    <notes>Morning cardio session</notes>
+    <exercises>
+      <exercise>
+        <exerciseName>Running</exerciseName>
+        <order>0</order>
+        <sets>
+          <set>
+            <setNumber>1</setNumber>
+            <duration>30</duration>
+            <distance>5</distance>
+            <notes>Steady pace</notes>
+          </set>
+        </sets>
+      </exercise>
+    </exercises>
+  </workout>
+</workouts>
