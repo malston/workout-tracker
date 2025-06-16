@@ -24,6 +24,7 @@ export default function WorkoutsPage() {
             <Link
               href="/workouts/new"
               className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-4 rounded-lg text-center font-semibold text-lg transition-colors"
+              onClick={() => console.log('Create New Workout clicked')}
             >
               Create New Workout
             </Link>

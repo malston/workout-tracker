@@ -26,7 +26,7 @@ interface EditableExercise {
 export default function EditWorkoutPage() {
   const router = useRouter()
   const params = useParams()
-  const { getWorkout } = useWorkouts()
+  const { getWorkout, loading: workoutsLoading } = useWorkouts()
   const { exercises: allExercises } = useExercises()
   const [workout, setWorkout] = useState<any>(null)
   const [workoutName, setWorkoutName] = useState('')
@@ -35,18 +35,27 @@ export default function EditWorkoutPage() {
   const [saving, setSaving] = useState(false)
 
   useEffect(() => {
+    // Don't try to load workout until workouts are loaded
+    if (workoutsLoading) {
+      return
+    }
+    
     const workoutId = params.id as string
     const foundWorkout = getWorkout(workoutId)
     
-    if (foundWorkout && foundWorkout.status === 'planned') {
-      setWorkout(foundWorkout)
-      setWorkoutName(foundWorkout.name)
-      setWorkoutExercises(foundWorkout.exercises)
+    if (foundWorkout) {
+      if (foundWorkout.status === 'planned') {
+        setWorkout(foundWorkout)
+        setWorkoutName(foundWorkout.name)
+        setWorkoutExercises(foundWorkout.exercises || [])
+      } else {
+        router.push('/workouts')
+      }
     } else {
       router.push('/workouts')
     }
     setLoading(false)
-  }, [params.id, getWorkout, router])
+  }, [params.id, getWorkout, router, workoutsLoading])
 
   const updateExerciseSet = (exerciseIndex: number, setIndex: number, field: 'reps' | 'weight', value: number) => {
     setWorkoutExercises(prev => prev.map((exercise, exIdx) => 

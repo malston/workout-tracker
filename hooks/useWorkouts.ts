@@ -197,6 +197,45 @@ export const useWorkouts = () => {
     return workouts.find(w => w.id === id);
   }, [workouts]);
 
+  // Update existing workout
+  const updateWorkout = useCallback(async (id: string, updates: Partial<WorkoutWithSets>) => {
+    setError(null);
+
+    try {
+      if (isConnected) {
+        // Try to update in database via API
+        const response = await fetch(`/api/workouts/${id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(updates),
+        });
+
+        if (!response.ok) {
+          console.warn('Failed to update workout in database, falling back to localStorage');
+        }
+      }
+      
+      // Update in local state and localStorage
+      const updatedWorkouts = workouts.map(workout => 
+        workout.id === id 
+          ? { ...workout, ...updates, updatedAt: new Date() }
+          : workout
+      );
+      
+      setWorkouts(updatedWorkouts);
+      setToLocalStorage(localStorageKeys.workouts, updatedWorkouts);
+      
+      // Return the updated workout
+      return updatedWorkouts.find(w => w.id === id);
+    } catch (err) {
+      console.error('Failed to update workout:', err);
+      setError(err instanceof Error ? err.message : 'Failed to update workout');
+      throw err;
+    }
+  }, [isConnected, workouts]);
+
   useEffect(() => {
     loadWorkouts();
   }, [loadWorkouts]);
@@ -208,6 +247,7 @@ export const useWorkouts = () => {
     createWorkout,
     addWorkout: createWorkout, // Alias for backward compatibility
     getWorkout,
+    updateWorkout,
     refetch: loadWorkouts
   };
 };

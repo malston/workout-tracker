@@ -27,7 +27,7 @@ interface ActiveWorkout {
 export default function WorkoutSessionPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const { getWorkout, loading: workoutsLoading } = useWorkouts()
+  const { getWorkout, updateWorkout, loading: workoutsLoading } = useWorkouts()
   const [workout, setWorkout] = useState<ActiveWorkout | null>(null)
   const [currentExerciseIndex, setCurrentExerciseIndex] = useState(0)
   const [showRestTimer, setShowRestTimer] = useState(false)
@@ -131,34 +131,38 @@ export default function WorkoutSessionPage() {
     
     // Update the planned workout to completed status
     try {
-      const plannedWorkout = getWorkout(workout.id)
-      if (plannedWorkout) {
-        // Update the workout with completed status and session data
-        // Note: This would need an updateWorkout function in useWorkouts hook
-        // For now, we'll save to localStorage as before
-      }
+      await updateWorkout(workout.id, {
+        status: 'completed',
+        exercises: workout.exercises.map((exercise, index) => ({
+          id: `exercise-${workout.id}-${index}`,
+          exercise: {
+            id: exercise.name.toLowerCase().replace(/\s+/g, '-'),
+            name: exercise.name,
+            category: 'strength'
+          },
+          sets: exercise.sets.map((set, setIndex) => ({
+            id: `set-${workout.id}-${index}-${setIndex}`,
+            setNumber: setIndex + 1,
+            reps: set.reps,
+            weight: set.weight,
+            completed: set.completed,
+            duration: null,
+            distance: null,
+            notes: null
+          }))
+        }))
+      })
+      
+      console.log('Successfully updated workout to completed status')
     } catch (error) {
       console.error('Failed to update workout status:', error)
     }
     
-    const completedWorkout = {
-      ...workout,
-      date: startTime.toISOString(),
-      duration,
-      totalVolume,
-      status: 'completed'
-    }
-    
-    // Save to localStorage
-    const existingWorkouts = JSON.parse(localStorage.getItem('workouts') || '[]')
-    existingWorkouts.unshift(completedWorkout)
-    localStorage.setItem('workouts', JSON.stringify(existingWorkouts))
-    
     // Clear session
     sessionStorage.removeItem('activeWorkout')
     
-    // Navigate to details page
-    router.push(`/workouts/${workout.id}`)
+    // Navigate to workouts page
+    router.push('/workouts')
   }
 
   const cancelWorkout = () => {

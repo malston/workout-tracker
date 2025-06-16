@@ -26,6 +26,8 @@ function NewWorkoutContent() {
   const isQuickStart = searchParams.get('quick') === 'true'
   const templateFromUrl = searchParams.get('template')
   
+  console.log('NewWorkoutContent rendering')
+  
   const [workoutName, setWorkoutName] = useState('')
   const [selectedTemplate, setSelectedTemplate] = useState<string | null>(templateFromUrl)
   const [isSaving, setIsSaving] = useState(false)
