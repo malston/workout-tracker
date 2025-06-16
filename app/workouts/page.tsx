@@ -106,20 +106,29 @@ export default function WorkoutsPage() {
                   Recent Workouts
                 </h2>
                 <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-                  {completedWorkouts.map((workout) => (
-                    <WorkoutCard 
-                      key={workout.id} 
-                      workout={{
-                        id: workout.id,
-                        name: workout.name,
-                        date: workout.date.toString(),
-                        duration: 0, // Will be calculated from exercises
-                        exercises: workout.exercises.length,
-                        totalVolume: 0, // Will be calculated from sets
-                        status: workout.status
-                      }} 
-                    />
-                  ))}
+                  {completedWorkouts.map((workout) => {
+                    // Use stored values if available, otherwise calculate from sets
+                    const totalVolume = workout.totalVolume || workout.exercises?.reduce((total, exercise) => 
+                      total + (exercise.sets?.reduce((setTotal, set) => 
+                        setTotal + (set.completed ? (set.weight || 0) * (set.reps || 0) : 0), 0) || 0), 0) || 0
+                    
+                    const duration = workout.duration || 0
+                    
+                    return (
+                      <WorkoutCard 
+                        key={workout.id} 
+                        workout={{
+                          id: workout.id,
+                          name: workout.name,
+                          date: workout.date.toString(),
+                          duration: duration,
+                          exercises: workout.exercises?.length || 0,
+                          totalVolume: totalVolume,
+                          status: workout.status
+                        }} 
+                      />
+                    )
+                  })}
                 </div>
               </div>
             )}

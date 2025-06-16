@@ -34,8 +34,12 @@ type WorkoutWithSets = Workout & {
       duration?: number | null;
       distance?: number | null;
       notes?: string | null;
+      completed?: boolean;
     }>;
   }>;
+  // Optional fields for completed workouts
+  totalVolume?: number;
+  duration?: number;
 };
 
 type NewWorkout = Omit<Workout, 'id' | 'createdAt' | 'updatedAt'> & {
@@ -236,6 +240,35 @@ export const useWorkouts = () => {
     }
   }, [isConnected, workouts]);
 
+  // Delete workout
+  const deleteWorkout = useCallback(async (id: string) => {
+    setError(null);
+
+    try {
+      if (isConnected) {
+        // Try to delete from database via API
+        const response = await fetch(`/api/workouts/${id}`, {
+          method: 'DELETE',
+        });
+
+        if (!response.ok) {
+          console.warn('Failed to delete workout from database, falling back to localStorage');
+        }
+      }
+      
+      // Remove from local state and localStorage
+      const updatedWorkouts = workouts.filter(workout => workout.id !== id);
+      setWorkouts(updatedWorkouts);
+      setToLocalStorage(localStorageKeys.workouts, updatedWorkouts);
+      
+      return true;
+    } catch (err) {
+      console.error('Failed to delete workout:', err);
+      setError(err instanceof Error ? err.message : 'Failed to delete workout');
+      throw err;
+    }
+  }, [isConnected, workouts]);
+
   useEffect(() => {
     loadWorkouts();
   }, [loadWorkouts]);
@@ -248,6 +281,7 @@ export const useWorkouts = () => {
     addWorkout: createWorkout, // Alias for backward compatibility
     getWorkout,
     updateWorkout,
+    deleteWorkout,
     refetch: loadWorkouts
   };
 };
