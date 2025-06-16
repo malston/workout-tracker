@@ -1,0 +1,124 @@
+[
+    {
+        "name": "Home Leg Workout",
+        "date": "2025-06-16",
+        "status": "planned",
+        "exercises": [
+            {
+                "exerciseName": "Step Jumps",
+                "sets": [
+                    {
+                        "setNumber": 1,
+                        "reps": 12,
+                        "weight": 0
+                    }
+                ]
+            },
+            {
+                "exerciseName": "Step Ups",
+                "sets": [
+                    {
+                        "setNumber": 1,
+                        "reps": 12,
+                        "weight": 60
+                    },
+                    {
+                        "setNumber": 2,
+                        "reps": 12,
+                        "weight": 60
+                    },
+                    {
+                        "setNumber": 3,
+                        "reps": 12,
+                        "weight": 60
+                    }
+                ]
+            },
+            {
+                "exerciseName": "Dumbbell Deadlifts",
+                "sets": [
+                    {
+                        "setNumber": 1,
+                        "reps": 10,
+                        "weight": 80
+                    },
+                    {
+                        "setNumber": 2,
+                        "reps": 10,
+                        "weight": 120
+                    },
+                    {
+                        "setNumber": 3,
+                        "reps": 12,
+                        "weight": 120
+                    },
+                    {
+                        "setNumber": 4,
+                        "reps": 12,
+                        "weight": 120
+                    }
+                ]
+            },
+            {
+                "exerciseName": "Dumbbell Squats",
+                "sets": [
+                    {
+                        "setNumber": 1,
+                        "reps": 12,
+                        "weight": 120
+                    },
+                    {
+                        "setNumber": 2,
+                        "reps": 10,
+                        "weight": 130
+                    },
+                    {
+                        "setNumber": 3,
+                        "reps": 10,
+                        "weight": 130
+                    }
+                ]
+            },
+            {
+                "exerciseName": "Romanian Deadlifts",
+                "sets": [
+                    {
+                        "setNumber": 1,
+                        "reps": 10,
+                        "weight": 105
+                    },
+                    {
+                        "setNumber": 2,
+                        "reps": 12,
+                        "weight": 110
+                    },
+                    {
+                        "setNumber": 3,
+                        "reps": 12,
+                        "weight": 110
+                    }
+                ]
+            },
+            {
+                "exerciseName": "Dumbbell Lunges",
+                "sets": [
+                    {
+                        "setNumber": 1,
+                        "reps": 12,
+                        "weight": 40
+                    },
+                    {
+                        "setNumber": 2,
+                        "reps": 12,
+                        "weight": 40
+                    },
+                    {
+                        "setNumber": 3,
+                        "reps": 12,
+                        "weight": 40
+                    }
+                ]
+            }
+        ]
+    }
+]
