@@ -28,7 +28,8 @@
       "Bash(npm run test:coverage:*)",
       "Bash(git commit:*)",
       "Bash(git push:*)",
-      "Bash(node:*)"
+      "Bash(node:*)",
+      "Bash(cat:*)"
     ],
     "deny": []
   }

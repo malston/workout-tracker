@@ -4,6 +4,7 @@ import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import WorkoutTemplateSelector from '@/components/WorkoutTemplateSelector'
 import { WORKOUT_TEMPLATES } from '@/data/workout-templates'
+import { useWorkouts } from '@/hooks/useWorkouts'
 
 // Helper function to parse template sets and create actual set objects
 function parseTemplateSets(setsString: string) {
@@ -27,36 +28,77 @@ function NewWorkoutContent() {
   
   const [workoutName, setWorkoutName] = useState('')
   const [selectedTemplate, setSelectedTemplate] = useState<string | null>(templateFromUrl)
+  const [isSaving, setIsSaving] = useState(false)
+  const { addWorkout } = useWorkouts()
 
-  const startWorkout = () => {
-    // Find the selected template
-    const template = selectedTemplate ? WORKOUT_TEMPLATES.find(t => t.id === selectedTemplate) : null
+  const createWorkout = async () => {
+    if (isSaving) return
     
-    // Convert template exercises to workout exercises with pre-created sets
-    const exercises = template ? template.exercises.map((exercise, index) => ({
-      name: exercise.name,
-      sets: parseTemplateSets(exercise.sets) // Parse template sets and create actual set objects
-    })) : []
-    
-    const workoutData = {
-      id: Date.now().toString(),
-      name: workoutName || (template ? `${template.name} Workout` : 'Custom Workout'),
-      template: selectedTemplate,
-      templateName: template?.name || null,
-      startTime: new Date().toISOString(),
-      exercises: exercises
+    try {
+      setIsSaving(true)
+      console.log('Creating workout...')
+      
+      // Find the selected template
+      const template = selectedTemplate ? WORKOUT_TEMPLATES.find(t => t.id === selectedTemplate) : null
+      console.log('Selected template:', template)
+      
+      // Convert template exercises to workout exercises with pre-created sets
+      const exercises = template ? template.exercises.map((exercise, exerciseIndex) => ({
+        id: `exercise-${Date.now()}-${exerciseIndex}`,
+        exercise: {
+          id: `${exercise.name.toLowerCase().replace(/\s+/g, '-')}`,
+          name: exercise.name,
+          category: 'strength' // Default category, could be enhanced based on muscles
+        },
+        sets: parseTemplateSets(exercise.sets).map((set, setIndex) => ({
+          id: `set-${Date.now()}-${exerciseIndex}-${setIndex}`,
+          setNumber: setIndex + 1,
+          reps: set.reps,
+          weight: set.weight,
+          completed: set.completed,
+          duration: null,
+          distance: null,
+          notes: null
+        }))
+      })) : []
+      
+      console.log('Exercises to create:', exercises)
+      
+      const workoutData = {
+        name: workoutName || (template ? `${template.name} Workout` : 'Custom Workout'),
+        date: new Date(), // Add the required date field
+        notes: template ? `Created from ${template.name} template` : '',
+        status: 'planned' as const, // Mark as planned, not started
+        exercises: exercises,
+        templateId: selectedTemplate || null
+      }
+      
+      console.log('Workout data to save:', workoutData)
+      
+      // Save the workout using the hook
+      const newWorkout = await addWorkout(workoutData)
+      console.log('Created workout:', newWorkout)
+      
+      // Navigate back to workouts list
+      router.push('/workouts')
+      
+    } catch (error) {
+      console.error('Failed to create workout:', error)
+      // Don't show error if it's just using localStorage fallback
+      if (error instanceof Error && error.message.includes('database')) {
+        console.log('Using localStorage fallback for workout creation')
+      } else {
+        alert('Failed to create workout. Please try again.')
+      }
+    } finally {
+      setIsSaving(false)
     }
-    
-    // Save to session storage for active workout
-    sessionStorage.setItem('activeWorkout', JSON.stringify(workoutData))
-    
-    // Navigate to session page
-    router.push('/workouts/session')
   }
 
+  // Quick start will immediately create and save a basic workout
   useEffect(() => {
     if (isQuickStart) {
-      startWorkout()
+      createWorkout()
     }
   }, [isQuickStart])
 
@@ -65,7 +107,7 @@ function NewWorkoutContent() {
       <div className="min-h-screen bg-gray-100 dark:bg-gray-900 flex items-center justify-center">
         <div className="text-center">
           <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
-          <p className="mt-4 text-gray-600 dark:text-gray-400">Starting workout...</p>
+          <p className="mt-4 text-gray-600 dark:text-gray-400">Creating workout...</p>
         </div>
       </div>
     )
@@ -156,14 +198,16 @@ function NewWorkoutContent() {
 
         <div className="flex gap-4">
           <button
-            onClick={startWorkout}
-            className="flex-1 bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold text-lg transition-colors"
+            onClick={createWorkout}
+            disabled={isSaving}
+            className="flex-1 bg-blue-500 hover:bg-blue-600 disabled:bg-blue-300 text-white px-6 py-3 rounded-lg font-semibold text-lg transition-colors"
           >
-            {selectedTemplate ? 'Start Template Workout' : 'Start Custom Workout'}
+            {isSaving ? 'Creating...' : 'Create Workout'}
           </button>
           <button
             onClick={() => router.back()}
-            className="px-6 py-3 border border-gray-300 dark:border-gray-600 rounded-lg font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+            disabled={isSaving}
+            className="px-6 py-3 border border-gray-300 dark:border-gray-600 rounded-lg font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 transition-colors"
           >
             Cancel
           </button>

@@ -73,11 +73,11 @@ export default function TemplatesPage() {
                     className="flex-1"
                     onClick={(e) => {
                       e.stopPropagation();
-                      // Navigate to start workout with this template
+                      // Navigate to create workout with this template
                       window.location.href = `/workouts/new?template=${template.id}`;
                     }}
                   >
-                    Start Workout
+                    Create Workout
                   </Button>
                   <Button 
                     variant="outline"
@@ -196,7 +196,7 @@ export default function TemplatesPage() {
                       window.location.href = `/workouts/new?template=${selectedTemplateData.id}`;
                     }}
                   >
-                    Start This Workout
+                    Create This Workout
                   </Button>
                   <Button 
                     variant="outline"

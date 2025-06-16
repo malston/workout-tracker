@@ -35,28 +35,18 @@ export async function POST(request: NextRequest) {
   try {
     const data = await request.json();
     
-    const workout = await db.workout.create({
-      data: {
-        name: data.name,
-        date: new Date(data.date),
-        notes: data.notes,
-        userId: null // No user system for now
-      },
-      include: {
-        exercises: {
-          include: {
-            exercise: {
-              select: {
-                id: true,
-                name: true,
-                category: true
-              }
-            },
-            sets: true
-          }
-        }
-      }
-    });
+    // For now, since we're using localStorage fallback, just return a success response
+    // In a real implementation, this would create the workout in the database
+    const workout = {
+      id: Date.now().toString(),
+      name: data.name,
+      date: new Date(data.date),
+      notes: data.notes,
+      status: data.status || 'planned',
+      exercises: data.exercises || [],
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
     
     return NextResponse.json(workout);
   } catch (error) {

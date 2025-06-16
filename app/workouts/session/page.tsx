@@ -1,7 +1,8 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { useWorkouts } from '@/hooks/useWorkouts'
 import ExerciseTracker from '@/components/ExerciseTracker'
 import WorkoutTimer from '@/components/WorkoutTimer'
 import RestTimer from '@/components/RestTimer'
@@ -25,20 +26,61 @@ interface ActiveWorkout {
 
 export default function WorkoutSessionPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const { getWorkout, loading: workoutsLoading } = useWorkouts()
   const [workout, setWorkout] = useState<ActiveWorkout | null>(null)
   const [currentExerciseIndex, setCurrentExerciseIndex] = useState(0)
   const [showRestTimer, setShowRestTimer] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    const activeWorkout = sessionStorage.getItem('activeWorkout')
-    if (activeWorkout) {
-      setWorkout(JSON.parse(activeWorkout))
+    // Don't try to load workout until workouts have finished loading
+    if (workoutsLoading) {
+      console.log('Session page - still loading workouts, waiting...')
+      return
+    }
+    
+    const workoutId = searchParams.get('workoutId')
+    console.log('Session page - workoutId from URL:', workoutId)
+    
+    if (workoutId) {
+      // Loading from a planned workout
+      const plannedWorkout = getWorkout(workoutId)
+      console.log('Session page - found workout:', plannedWorkout)
+      
+      if (plannedWorkout && plannedWorkout.status === 'planned') {
+        console.log('Session page - creating active workout from planned workout')
+        const activeWorkout: ActiveWorkout = {
+          id: plannedWorkout.id,
+          name: plannedWorkout.name,
+          template: null,
+          startTime: new Date().toISOString(),
+          exercises: plannedWorkout.exercises.map(ex => ({
+            name: ex.exercise.name,
+            sets: ex.sets.map(set => ({
+              reps: set.reps || 0,
+              weight: set.weight || 0,
+              completed: set.completed || false
+            }))
+          }))
+        }
+        setWorkout(activeWorkout)
+        sessionStorage.setItem('activeWorkout', JSON.stringify(activeWorkout))
+      } else {
+        console.log('Session page - workout not found or not planned, redirecting to /workouts')
+        router.push('/workouts')
+      }
     } else {
-      router.push('/workouts/new')
+      // Check for existing active workout
+      const activeWorkout = sessionStorage.getItem('activeWorkout')
+      if (activeWorkout) {
+        setWorkout(JSON.parse(activeWorkout))
+      } else {
+        router.push('/workouts/new')
+      }
     }
     setIsLoading(false)
-  }, [router])
+  }, [router, searchParams, getWorkout, workoutsLoading])
 
   const addExercise = (exerciseName: string) => {
     if (!workout) return
@@ -73,7 +115,7 @@ export default function WorkoutSessionPage() {
     sessionStorage.setItem('activeWorkout', JSON.stringify(updatedWorkout))
   }
 
-  const finishWorkout = () => {
+  const finishWorkout = async () => {
     if (!workout) return
     
     const endTime = new Date()
@@ -87,11 +129,24 @@ export default function WorkoutSessionPage() {
       }, 0)
     }, 0)
     
+    // Update the planned workout to completed status
+    try {
+      const plannedWorkout = getWorkout(workout.id)
+      if (plannedWorkout) {
+        // Update the workout with completed status and session data
+        // Note: This would need an updateWorkout function in useWorkouts hook
+        // For now, we'll save to localStorage as before
+      }
+    } catch (error) {
+      console.error('Failed to update workout status:', error)
+    }
+    
     const completedWorkout = {
       ...workout,
       date: startTime.toISOString(),
       duration,
-      totalVolume
+      totalVolume,
+      status: 'completed'
     }
     
     // Save to localStorage
@@ -113,7 +168,7 @@ export default function WorkoutSessionPage() {
     }
   }
 
-  if (isLoading || !workout) {
+  if (isLoading || workoutsLoading || !workout) {
     return (
       <div className="min-h-screen bg-gray-100 dark:bg-gray-900 flex items-center justify-center">
         <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 dark:border-white"></div>

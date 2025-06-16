@@ -13,6 +13,7 @@ type Workout = {
   name: string;
   date: Date;
   notes?: string | null;
+  status: 'planned' | 'completed';
   createdAt: Date;
   updatedAt: Date;
 };
@@ -37,7 +38,10 @@ type WorkoutWithSets = Workout & {
   }>;
 };
 
-type NewWorkout = Omit<Workout, 'id' | 'createdAt' | 'updatedAt'>;
+type NewWorkout = Omit<Workout, 'id' | 'createdAt' | 'updatedAt'> & {
+  exercises?: any[];
+  templateId?: string | null;
+};
 
 export const useWorkouts = () => {
   const { isConnected } = useDatabase();
@@ -56,9 +60,30 @@ export const useWorkouts = () => {
         const response = await fetch('/api/workouts');
         if (response.ok) {
           const dbWorkouts = await response.json();
-          setWorkouts(dbWorkouts);
+          console.log('Loaded workouts from DB:', dbWorkouts);
+          
+          // Get any local workouts that might not be in the database
+          const localWorkouts = getFromLocalStorage<WorkoutWithSets[]>(
+            localStorageKeys.workouts,
+            []
+          );
+          
+          // Merge database workouts with any local-only workouts (by checking IDs)
+          const dbIds = new Set(dbWorkouts.map((w: any) => w.id));
+          const localOnlyWorkouts = localWorkouts.filter(w => !dbIds.has(w.id));
+          
+          // Add status field to database workouts if missing
+          const normalizedDbWorkouts = dbWorkouts.map((w: any) => ({
+            ...w,
+            status: w.status || 'completed' // Default old workouts to completed
+          }));
+          
+          const mergedWorkouts = [...normalizedDbWorkouts, ...localOnlyWorkouts];
+          console.log('Merged workouts:', mergedWorkouts);
+          
+          setWorkouts(mergedWorkouts);
           // Sync to localStorage as backup
-          setToLocalStorage(localStorageKeys.workouts, dbWorkouts);
+          setToLocalStorage(localStorageKeys.workouts, mergedWorkouts);
         } else {
           throw new Error('Failed to fetch workouts from database');
         }
@@ -68,7 +93,15 @@ export const useWorkouts = () => {
           localStorageKeys.workouts,
           []
         );
-        setWorkouts(localWorkouts);
+        console.log('Loaded workouts from localStorage:', localWorkouts);
+        
+        // Ensure all workouts have a status field
+        const normalizedWorkouts = localWorkouts.map(w => ({
+          ...w,
+          status: w.status || 'completed'
+        }));
+        
+        setWorkouts(normalizedWorkouts);
       }
     } catch (err) {
       console.error('Failed to load workouts:', err);
@@ -79,7 +112,15 @@ export const useWorkouts = () => {
         localStorageKeys.workouts,
         []
       );
-      setWorkouts(localWorkouts);
+      console.log('Fallback - loaded workouts from localStorage:', localWorkouts);
+      
+      // Ensure all workouts have a status field
+      const normalizedWorkouts = localWorkouts.map(w => ({
+        ...w,
+        status: w.status || 'completed'
+      }));
+      
+      setWorkouts(normalizedWorkouts);
     } finally {
       setLoading(false);
     }
@@ -101,7 +142,22 @@ export const useWorkouts = () => {
         });
 
         if (!response.ok) {
-          throw new Error('Failed to create workout in database');
+          console.warn('Failed to create workout in database, falling back to localStorage');
+          // Fall back to localStorage instead of throwing error
+          const newWorkout: WorkoutWithSets = {
+            id: generateId(),
+            ...workoutData,
+            status: workoutData.status || 'planned',
+            exercises: workoutData.exercises || [],
+            createdAt: new Date(),
+            updatedAt: new Date()
+          };
+          
+          const updatedWorkouts = [...workouts, newWorkout];
+          setWorkouts(updatedWorkouts);
+          setToLocalStorage(localStorageKeys.workouts, updatedWorkouts);
+          
+          return newWorkout;
         }
 
         const newWorkout = await response.json();
@@ -117,7 +173,8 @@ export const useWorkouts = () => {
         const newWorkout: WorkoutWithSets = {
           id: generateId(),
           ...workoutData,
-          exercises: [],
+          status: workoutData.status || 'planned',
+          exercises: workoutData.exercises || [],
           createdAt: new Date(),
           updatedAt: new Date()
         };
@@ -149,6 +206,7 @@ export const useWorkouts = () => {
     loading,
     error,
     createWorkout,
+    addWorkout: createWorkout, // Alias for backward compatibility
     getWorkout,
     refetch: loadWorkouts
   };

@@ -28,6 +28,9 @@ export default function ExerciseTracker({
 }: ExerciseTrackerProps) {
   const [newReps, setNewReps] = useState('')
   const [newWeight, setNewWeight] = useState('')
+  const [editingSet, setEditingSet] = useState<number | null>(null)
+  const [editWeight, setEditWeight] = useState('')
+  const [editReps, setEditReps] = useState('')
 
   const addSet = () => {
     if (!newReps || !newWeight) return
@@ -75,6 +78,34 @@ export default function ExerciseTracker({
     onUpdate(updatedExercise)
   }
 
+  const startEditingSet = (setIndex: number) => {
+    setEditingSet(setIndex)
+    setEditWeight(exercise.sets[setIndex].weight.toString())
+    setEditReps(exercise.sets[setIndex].reps.toString())
+  }
+
+  const saveSetEdit = (setIndex: number) => {
+    if (!editWeight || !editReps) return
+    
+    const updatedExercise = {
+      ...exercise,
+      sets: exercise.sets.map((set, idx) => 
+        idx === setIndex 
+          ? { ...set, weight: parseFloat(editWeight), reps: parseInt(editReps) }
+          : set
+      )
+    }
+    
+    onUpdate(updatedExercise)
+    setEditingSet(null)
+  }
+
+  const cancelEdit = () => {
+    setEditingSet(null)
+    setEditWeight('')
+    setEditReps('')
+  }
+
   const completedSets = exercise.sets.filter(set => set.completed).length
 
   return (
@@ -102,7 +133,7 @@ export default function ExerciseTracker({
                   : 'bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600'
               }`}
             >
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-4 flex-1">
                 <button
                   onClick={() => toggleSet(index)}
                   className={`w-6 h-6 rounded-full border-2 transition-colors ${
@@ -120,18 +151,77 @@ export default function ExerciseTracker({
                 <span className="font-medium text-gray-700 dark:text-gray-300">
                   Set {index + 1}
                 </span>
-                <span className="text-gray-900 dark:text-white">
-                  {set.weight} lbs × {set.reps} reps
-                </span>
+                {editingSet === index ? (
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="number"
+                      value={editWeight}
+                      onChange={(e) => setEditWeight(e.target.value)}
+                      className="w-20 px-2 py-1 border border-gray-300 dark:border-gray-600 rounded text-sm dark:bg-gray-700 dark:text-white"
+                      placeholder="Weight"
+                    />
+                    <span className="text-sm text-gray-500">lbs ×</span>
+                    <input
+                      type="number"
+                      value={editReps}
+                      onChange={(e) => setEditReps(e.target.value)}
+                      className="w-16 px-2 py-1 border border-gray-300 dark:border-gray-600 rounded text-sm dark:bg-gray-700 dark:text-white"
+                      placeholder="Reps"
+                    />
+                    <span className="text-sm text-gray-500">reps</span>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => startEditingSet(index)}
+                    className="text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400"
+                  >
+                    {set.weight} lbs × {set.reps} reps
+                  </button>
+                )}
               </div>
-              <button
-                onClick={() => removeSet(index)}
-                className="text-red-500 hover:text-red-600 p-1"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
+              <div className="flex items-center gap-1">
+                {editingSet === index ? (
+                  <>
+                    <button
+                      onClick={() => saveSetEdit(index)}
+                      className="text-green-500 hover:text-green-600 p-1"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                    </button>
+                    <button
+                      onClick={cancelEdit}
+                      className="text-gray-500 hover:text-gray-600 p-1"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <button
+                      onClick={() => startEditingSet(index)}
+                      className="text-blue-500 hover:text-blue-600 p-1"
+                      title="Edit set"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                      </svg>
+                    </button>
+                    <button
+                      onClick={() => removeSet(index)}
+                      className="text-red-500 hover:text-red-600 p-1"
+                      title="Remove set"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      </svg>
+                    </button>
+                  </>
+                )}
+              </div>
             </div>
           ))}
         </div>

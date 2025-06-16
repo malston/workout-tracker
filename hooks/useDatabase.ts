@@ -47,6 +47,7 @@ export const useDatabase = () => {
 
   return {
     isConnected: status.isConnected,
+    loading: status.isChecking,
     isChecking: status.isChecking,
     error: status.error,
     checkConnection,
