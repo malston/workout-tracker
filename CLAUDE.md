@@ -78,7 +78,7 @@ workout-tracker/
 ├── hooks/                 # Custom React hooks
 ├── utils/                 # Utility functions
 │   ├── localStorage.ts   # localStorage management
-│   └── fileImport.ts     # File parsing (CSV, JSON, XML)
+│   └── parsers/          # File parsing with status support (CSV, JSON, XML)
 ├── __tests__/            # Comprehensive test suite
 │   ├── hooks/           # Hook unit tests
 │   ├── utils/           # Utility function tests
@@ -94,32 +94,39 @@ workout-tracker/
 
 ### ✅ **Recently Completed Features:**
 
-1. **Workout Management Enhancements** (Latest Session)
+1. **Workout Import Enhancements** (Latest Session)
+   - **Status field support**: Import workouts as either 'planned' or 'completed' status
+   - **Flexible order field**: Exercise order is now optional, defaults to array index
+   - **Enhanced validation**: Improved workout import validation with better error messages
+   - **Updated documentation**: Import page and README now include status field documentation
+   - **Fixed import workflow**: Workouts properly stored through useWorkouts hook with status
+
+2. **Workout Management Enhancements** (Previous Session)
    - **Fixed workout deletion**: Proper deletion through useWorkouts hook with API support
    - **Completed workout editing**: Users can now edit completed workouts to fix errors
    - **Enhanced workout cards**: Added "Edit Workout" buttons to completed workouts
    - **Improved data storage**: Fixed duration and totalVolume tracking for completed workouts
    - **TypeScript compilation fixes**: Resolved type mismatches preventing page loading
 
-2. **Next.js 15 Compatibility** (Previous Session)
+3. **Next.js 15 Compatibility** (Previous Session)
    - Fixed all TypeScript errors for Next.js 15 async params
    - Updated API routes to handle Promise<{ id: string }> params
    - Fixed Suspense boundary requirements for useSearchParams
    - Application builds successfully with no errors
 
-3. **Complete Application Pages** (Previous Session)
+4. **Complete Application Pages** (Previous Session)
    - `/templates` - 6 pre-built workout templates with modal details
    - `/progress` - Comprehensive progress tracking with statistics
    - `/exercises/[id]` - Exercise detail view with full CRUD operations
    - All navigation links working without 404 errors
 
-4. **Database Architecture** (Previous Sessions)
+5. **Database Architecture** (Previous Sessions)
    - PostgreSQL with Prisma ORM setup
    - All CRUD operations moved to API routes (no browser Prisma usage)
    - Graceful localStorage fallback when database unavailable
    - Health check system for database connectivity
 
-5. **Comprehensive Testing Infrastructure** (Previous Session)
+6. **Comprehensive Testing Infrastructure** (Previous Session)
    - Jest + React Testing Library setup
    - 44 passing tests across utilities, hooks, components, and integration
    - **90%+ test coverage** on critical utilities:
@@ -237,8 +244,10 @@ The app supports importing exercises and workouts from:
 
 ### **Import Validation:**
 - Exercise data: name, category, muscleGroup, equipment, difficulty, instructions
-- Workout data: name, duration, caloriesBurned, notes
+- Workout data: name, date, status (planned/completed), exerciseName, setNumber, reps, weight, duration, distance
+- Optional fields: order (defaults to array index), notes for workouts and sets
 - Comprehensive error handling and data sanitization
+- Status-aware import: workouts can be imported as planned or completed
 
 See `/sample-imports/` for example files and format documentation.
 

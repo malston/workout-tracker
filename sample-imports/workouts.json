@@ -2,6 +2,7 @@
   {
     "name": "Monday Upper Body",
     "date": "2024-01-15",
+    "status": "completed",
     "notes": "Great workout, feeling strong",
     "exercises": [
       {
@@ -37,6 +38,7 @@
   {
     "name": "Tuesday Cardio Session",
     "date": "2024-01-16",
+    "status": "planned",
     "notes": "Morning cardio workout",
     "exercises": [
       {

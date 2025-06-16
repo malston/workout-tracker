@@ -1,29 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '../../../generated/prisma';
 import { parseFile, detectFileType, getFileTypeFromMimeType, ImportedWorkout } from '../../../../utils/parsers';
-
-const prisma = new PrismaClient();
+import { generateId } from '../../../../utils/localStorage';
 
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
     const file = formData.get('file') as File;
-    const userId = formData.get('userId') as string;
     
     if (!file) {
       return NextResponse.json(
         { error: 'No file provided' },
         { status: 400 }
       );
-    }
-
-    // User ID is optional - if provided, verify it exists
-    let userExists = false;
-    if (userId) {
-      const user = await prisma.user.findUnique({
-        where: { id: userId }
-      });
-      userExists = !!user;
     }
 
     // Detect file type
@@ -55,82 +43,40 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Import workouts to database
+    // Convert parsed workouts to the format expected by useWorkouts hook
     const workouts = result.data as ImportedWorkout[];
     const imported: any[] = [];
-    const errors: string[] = [];
 
     for (const workout of workouts) {
-      try {
-        // Start a transaction for each workout
-        const importedWorkout = await prisma.$transaction(async (tx) => {
-          // Create the workout
-          const createdWorkout = await tx.workout.create({
-            data: {
-              name: workout.name,
-              date: workout.date instanceof Date ? workout.date : new Date(workout.date),
-              notes: workout.notes,
-              userId: userExists ? userId : null
-            }
-          });
+      const workoutData = {
+        id: generateId(),
+        name: workout.name,
+        date: workout.date instanceof Date ? workout.date : new Date(workout.date),
+        notes: workout.notes || '',
+        status: workout.status || 'planned', // Default to 'planned'
+        exercises: workout.exercises.map((exercise, index) => ({
+          id: `exercise-${generateId()}-${index}`,
+          exercise: {
+            id: exercise.exerciseName.toLowerCase().replace(/\s+/g, '-'),
+            name: exercise.exerciseName,
+            category: 'strength' // Default category
+          },
+          sets: exercise.sets.map((set, setIndex) => ({
+            id: `set-${generateId()}-${index}-${setIndex}`,
+            setNumber: set.setNumber,
+            reps: set.reps || 0,
+            weight: set.weight || 0,
+            duration: set.duration || null,
+            distance: set.distance || null,
+            notes: set.notes || null,
+            completed: workout.status === 'completed' // Mark as completed if workout is completed
+          }))
+        })),
+        createdAt: new Date(),
+        updatedAt: new Date()
+      };
 
-          // Create workout exercises and sets
-          for (const exercise of workout.exercises) {
-            // Find or create the exercise
-            let exerciseRecord = await tx.exercise.findUnique({
-              where: { name: exercise.exerciseName }
-            });
-
-            if (!exerciseRecord) {
-              // If exercise doesn't exist, create a basic one
-              exerciseRecord = await tx.exercise.create({
-                data: {
-                  name: exercise.exerciseName,
-                  category: 'other',
-                  muscleGroup: ['full body'],
-                  notes: 'Auto-created during workout import'
-                }
-              });
-            }
-
-            // Create workout exercise
-            const workoutExercise = await tx.workoutExercise.create({
-              data: {
-                workoutId: createdWorkout.id,
-                exerciseId: exerciseRecord.id,
-                order: exercise.order
-              }
-            });
-
-            // Create sets
-            for (const set of exercise.sets) {
-              await tx.set.create({
-                data: {
-                  workoutExerciseId: workoutExercise.id,
-                  setNumber: set.setNumber,
-                  reps: set.reps,
-                  weight: set.weight,
-                  duration: set.duration,
-                  distance: set.distance,
-                  notes: set.notes
-                }
-              });
-            }
-          }
-
-          return createdWorkout;
-        });
-
-        imported.push({
-          id: importedWorkout.id,
-          name: importedWorkout.name,
-          date: importedWorkout.date,
-          exerciseCount: workout.exercises.length,
-          totalSets: workout.exercises.reduce((sum, ex) => sum + ex.sets.length, 0)
-        });
-      } catch (error) {
-        errors.push(`Failed to import workout "${workout.name}": ${error instanceof Error ? error.message : 'Unknown error'}`);
-      }
+      imported.push(workoutData);
     }
 
     return NextResponse.json({
@@ -138,10 +84,10 @@ export async function POST(request: NextRequest) {
       summary: {
         total: workouts.length,
         imported: imported.length,
-        errors: errors.length
+        errors: 0
       },
       imported,
-      errors: errors.length > 0 ? errors : undefined
+      workouts: imported // Return formatted workouts for frontend to handle
     });
 
   } catch (error) {
@@ -150,8 +96,6 @@ export async function POST(request: NextRequest) {
       { error: 'Internal server error during import' },
       { status: 500 }
     );
-  } finally {
-    await prisma.$disconnect();
   }
 }
 

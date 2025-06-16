@@ -98,6 +98,22 @@ Optional fields:
 ]
 ```
 
+Required fields for JSON/XML:
+- `name` - Workout name
+- `date` - Date in YYYY-MM-DD format
+- `exerciseName` - Exercise name
+- `setNumber` - Set number
+
+Optional fields for JSON/XML:
+- `status` - Workout status: "planned" or "completed" (defaults to "planned")
+- `notes` - Workout notes
+- `order` - Exercise order (defaults to array index if not provided)
+- `reps` - Number of repetitions
+- `weight` - Weight in pounds
+- `duration` - Duration in minutes (for cardio)
+- `distance` - Distance in miles (for cardio)
+- Set `notes` - Notes for individual sets
+
 ### XML Format
 ```xml
 <workouts>
@@ -121,6 +137,8 @@ Optional fields:
   </workout>
 </workouts>
 ```
+
+Note: The `<order>` element is optional in XML format - it will default to the exercise position if not provided.
 
 ## Valid Muscle Groups
 

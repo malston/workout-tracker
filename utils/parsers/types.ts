@@ -9,12 +9,13 @@ export interface ImportedWorkout {
   name: string;
   date: string | Date;
   notes?: string;
+  status?: 'planned' | 'completed';
   exercises: ImportedWorkoutExercise[];
 }
 
 export interface ImportedWorkoutExercise {
   exerciseName: string;
-  order: number;
+  order?: number;
   sets: ImportedSet[];
 }
 

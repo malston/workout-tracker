@@ -65,6 +65,11 @@ export function validateWorkout(workout: any): { valid: boolean; errors: string[
     errors.push('Workout notes must be a string');
   }
 
+  // Validate status (optional)
+  if (workout.status !== undefined && !['planned', 'completed'].includes(workout.status)) {
+    errors.push('Workout status must be either "planned" or "completed"');
+  }
+
   // Validate exercises
   if (!workout.exercises || !Array.isArray(workout.exercises) || workout.exercises.length === 0) {
     errors.push('Workout must have at least one exercise');
@@ -87,9 +92,9 @@ function validateWorkoutExercise(exercise: any, index: number): string[] {
     errors.push(prefix + 'Exercise name is required');
   }
 
-  // Validate order
-  if (exercise.order === undefined || typeof exercise.order !== 'number' || exercise.order < 0) {
-    errors.push(prefix + 'Exercise order must be a non-negative number');
+  // Validate order (optional - will default to index if not provided)
+  if (exercise.order !== undefined && (typeof exercise.order !== 'number' || exercise.order < 0)) {
+    errors.push(prefix + 'Exercise order must be a non-negative number when provided');
   }
 
   // Validate sets
@@ -160,6 +165,7 @@ export function normalizeWorkout(workout: any): ImportedWorkout {
     name: workout.name.trim(),
     date: new Date(workout.date),
     notes: workout.notes?.trim(),
+    status: workout.status || 'planned', // Default to 'planned' if not specified
     exercises: workout.exercises.map((exercise: any, index: number) => ({
       exerciseName: exercise.exerciseName.trim(),
       order: exercise.order !== undefined ? exercise.order : index,

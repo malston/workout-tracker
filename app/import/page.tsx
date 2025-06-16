@@ -4,6 +4,7 @@ import { useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { Card, Button, LoadingSpinner } from '../../components';
 import { detectFileType } from '../../utils/parsers';
+import { useWorkouts } from '../../hooks/useWorkouts';
 
 type ImportType = 'exercise' | 'workout';
 
@@ -22,6 +23,7 @@ interface ImportResult {
 
 export default function ImportPage() {
   const router = useRouter();
+  const { addWorkout } = useWorkouts();
   const [importType, setImportType] = useState<ImportType>('exercise');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [importing, setImporting] = useState(false);
@@ -54,8 +56,6 @@ export default function ImportPage() {
       const formData = new FormData();
       formData.append('file', selectedFile);
 
-      // No user ID needed for now since we don't have authentication
-
       const response = await fetch(`/api/import/${importType}s`, {
         method: 'POST',
         body: formData
@@ -67,7 +67,42 @@ export default function ImportPage() {
         throw new Error(data.error || 'Import failed');
       }
 
-      setResult(data);
+      // For workout imports, actually store the workouts using the hook
+      if (importType === 'workout' && data.workouts) {
+        const importedWorkouts: any[] = [];
+        const errors: string[] = [];
+
+        for (const workoutData of data.workouts) {
+          try {
+            await addWorkout(workoutData);
+            importedWorkouts.push(workoutData);
+          } catch (error) {
+            errors.push(`Failed to import workout "${workoutData.name}": ${error instanceof Error ? error.message : 'Unknown error'}`);
+          }
+        }
+
+        // Update the result with actual import status
+        const finalResult = {
+          ...data,
+          summary: {
+            ...data.summary,
+            imported: importedWorkouts.length,
+            errors: errors.length
+          },
+          imported: importedWorkouts.map(w => ({
+            id: w.id,
+            name: w.name,
+            date: w.date,
+            status: w.status,
+            exerciseCount: w.exercises.length
+          })),
+          errors: errors.length > 0 ? errors : undefined
+        };
+
+        setResult(finalResult);
+      } else {
+        setResult(data);
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred during import');
     } finally {
@@ -190,9 +225,11 @@ export default function ImportPage() {
   {
     "name": "Morning Workout",
     "date": "2024-01-15",
+    "status": "planned",
     "exercises": [
       {
         "exerciseName": "Bench Press",
+        "order": 0,
         "sets": [
           { "setNumber": 1, "reps": 10, "weight": 135 }
         ]
@@ -201,6 +238,10 @@ export default function ImportPage() {
   }
 ]`}
                   </code>
+                </div>
+                <div className="mt-2 text-xs text-gray-600">
+                  <p><strong>Required:</strong> name, date, exerciseName, setNumber</p>
+                  <p><strong>Optional:</strong> status (planned/completed, defaults to 'planned'), order (defaults to array index), notes, reps, weight, duration, distance</p>
                 </div>
               </div>
             )}
