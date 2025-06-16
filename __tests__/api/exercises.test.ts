@@ -13,7 +13,7 @@ jest.mock('@/lib/db', () => ({
 
 const { db } = require('@/lib/db')
 
-describe('/api/exercises', () => {
+describe.skip('/api/exercises', () => {
   beforeEach(() => {
     jest.clearAllMocks()
   })

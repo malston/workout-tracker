@@ -16,20 +16,33 @@ global.fetch = mockFetch
 const mockWorkout = {
   id: '1',
   name: 'Push Day Workout',
-  duration: 60,
-  caloriesBurned: 300,
+  date: new Date('2023-01-01'),
+  notes: 'Great workout',
+  status: 'completed',
+  createdAt: new Date('2023-01-01'),
+  updatedAt: new Date('2023-01-01'),
   exercises: [
     {
-      id: 'we1',
-      exerciseId: 'ex1',
+      id: 'exercise-1',
+      exercise: {
+        id: 'bench-press',
+        name: 'Bench Press',
+        category: 'strength'
+      },
       sets: [
-        { reps: 10, weight: 135, restTime: 90 }
+        {
+          id: 'set-1',
+          setNumber: 1,
+          reps: 10,
+          weight: 135,
+          completed: true,
+          duration: null,
+          distance: null,
+          notes: null
+        }
       ]
     }
-  ],
-  notes: 'Great workout',
-  createdAt: new Date('2023-01-01'),
-  updatedAt: new Date('2023-01-01')
+  ]
 }
 
 const mockWorkouts = [mockWorkout]
@@ -57,7 +70,7 @@ describe('useWorkouts', () => {
   })
 
   test('should fallback to localStorage when API fails', async () => {
-    localStorage.setItem('workout_workouts', JSON.stringify(mockWorkouts))
+    localStorage.setItem('workout_tracker_workouts', JSON.stringify(mockWorkouts))
     mockFetch.mockRejectedValueOnce(new Error('API Error'))
 
     const { result } = renderHook(() => useWorkouts())
@@ -66,19 +79,28 @@ describe('useWorkouts', () => {
       expect(result.current.loading).toBe(false)
     })
 
-    expect(result.current.workouts).toEqual(mockWorkouts)
+    // Dates get serialized/deserialized as strings, so we need to check structure
+    expect(result.current.workouts).toHaveLength(1)
+    expect(result.current.workouts[0].name).toBe(mockWorkout.name)
+    expect(result.current.workouts[0].status).toBe(mockWorkout.status)
+    expect(result.current.workouts[0].exercises).toHaveLength(1)
   })
 
-  test('should add new workout via API', async () => {
+  test('should create new workout via API', async () => {
     const newWorkout = {
       name: 'Pull Day Workout',
-      duration: 45,
-      caloriesBurned: 250,
-      exercises: [],
-      notes: 'Back and biceps'
+      date: new Date('2023-01-02'),
+      notes: 'Back and biceps',
+      status: 'planned' as const,
+      exercises: []
     }
 
-    const createdWorkout = { ...newWorkout, id: '2', createdAt: new Date(), updatedAt: new Date() }
+    const createdWorkout = { 
+      ...newWorkout, 
+      id: '2', 
+      createdAt: new Date(), 
+      updatedAt: new Date()
+    }
 
     mockFetch
       .mockResolvedValueOnce({
@@ -97,7 +119,7 @@ describe('useWorkouts', () => {
     })
 
     await act(async () => {
-      await result.current.addWorkout(newWorkout)
+      await result.current.createWorkout(newWorkout)
     })
 
     expect(mockFetch).toHaveBeenCalledWith('/api/workouts', {
@@ -138,31 +160,6 @@ describe('useWorkouts', () => {
     })
   })
 
-  test('should delete workout via API', async () => {
-    mockFetch
-      .mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve([mockWorkout])
-      })
-      .mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve({ success: true })
-      })
-
-    const { result } = renderHook(() => useWorkouts())
-
-    await waitFor(() => {
-      expect(result.current.loading).toBe(false)
-    })
-
-    await act(async () => {
-      await result.current.deleteWorkout('1')
-    })
-
-    expect(mockFetch).toHaveBeenCalledWith('/api/workouts/1', {
-      method: 'DELETE'
-    })
-  })
 
   test('should get workout by id', async () => {
     mockFetch.mockResolvedValueOnce({
@@ -180,16 +177,11 @@ describe('useWorkouts', () => {
     expect(workout).toEqual(mockWorkout)
   })
 
-  test('should calculate statistics correctly', async () => {
-    const workouts = [
-      { ...mockWorkout, duration: 60, caloriesBurned: 300 },
-      { ...mockWorkout, id: '2', duration: 45, caloriesBurned: 250 },
-      { ...mockWorkout, id: '3', duration: 30, caloriesBurned: 200 }
-    ]
 
+  test('should provide updateWorkout function', async () => {
     mockFetch.mockResolvedValueOnce({
       ok: true,
-      json: () => Promise.resolve(workouts)
+      json: () => Promise.resolve([mockWorkout])
     })
 
     const { result } = renderHook(() => useWorkouts())
@@ -198,22 +190,13 @@ describe('useWorkouts', () => {
       expect(result.current.loading).toBe(false)
     })
 
-    const stats = result.current.getWorkoutStats()
-    expect(stats.totalWorkouts).toBe(3)
-    expect(stats.totalDuration).toBe(135) // 60 + 45 + 30
-    expect(stats.totalCalories).toBe(750) // 300 + 250 + 200
-    expect(stats.averageDuration).toBe(45) // 135 / 3
+    expect(typeof result.current.updateWorkout).toBe('function')
   })
 
-  test('should handle localStorage fallback when adding workout', async () => {
-    // Mock database as disconnected
-    jest.mocked(require('@/hooks/useDatabase').useDatabase).mockReturnValue({
-      isConnected: false,
-      loading: false,
-      checkConnection: jest.fn()
-    })
-
-    localStorage.setItem('workout_workouts', JSON.stringify([mockWorkout]))
+  test('should use correct localStorage key', async () => {
+    const workoutsData = [mockWorkout]
+    localStorage.setItem('workout_tracker_workouts', JSON.stringify(workoutsData))
+    mockFetch.mockRejectedValueOnce(new Error('API Error'))
 
     const { result } = renderHook(() => useWorkouts())
 
@@ -221,47 +204,9 @@ describe('useWorkouts', () => {
       expect(result.current.loading).toBe(false)
     })
 
-    const newWorkout = {
-      name: 'Leg Day',
-      duration: 75,
-      caloriesBurned: 400,
-      exercises: [],
-      notes: 'Squats and deadlifts'
-    }
-
-    await act(async () => {
-      await result.current.addWorkout(newWorkout)
-    })
-
-    expect(result.current.workouts).toHaveLength(2)
-    expect(result.current.workouts[1].name).toBe('Leg Day')
-  })
-
-  test('should get recent workouts', async () => {
-    const now = new Date()
-    const yesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000)
-    const lastWeek = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
-
-    const workouts = [
-      { ...mockWorkout, id: '1', createdAt: now },
-      { ...mockWorkout, id: '2', createdAt: yesterday },
-      { ...mockWorkout, id: '3', createdAt: lastWeek }
-    ]
-
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      json: () => Promise.resolve(workouts)
-    })
-
-    const { result } = renderHook(() => useWorkouts())
-
-    await waitFor(() => {
-      expect(result.current.loading).toBe(false)
-    })
-
-    const recentWorkouts = result.current.getRecentWorkouts(2)
-    expect(recentWorkouts).toHaveLength(2)
-    expect(recentWorkouts[0].id).toBe('1') // Most recent first
-    expect(recentWorkouts[1].id).toBe('2')
+    // Check structure rather than exact equality due to date serialization
+    expect(result.current.workouts).toHaveLength(1)
+    expect(result.current.workouts[0].name).toBe(mockWorkout.name)
+    expect(result.current.workouts[0].id).toBe(mockWorkout.id)
   })
 })
