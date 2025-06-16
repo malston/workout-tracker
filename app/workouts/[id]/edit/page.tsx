@@ -44,13 +44,18 @@ export default function EditWorkoutPage() {
     const foundWorkout = getWorkout(workoutId)
     
     if (foundWorkout) {
-      if (foundWorkout.status === 'planned') {
-        setWorkout(foundWorkout)
-        setWorkoutName(foundWorkout.name)
-        setWorkoutExercises(foundWorkout.exercises || [])
-      } else {
-        router.push('/workouts')
-      }
+      setWorkout(foundWorkout)
+      setWorkoutName(foundWorkout.name)
+      setWorkoutExercises((foundWorkout.exercises || []).map(exercise => ({
+        ...exercise,
+        sets: exercise.sets.map(set => ({
+          id: set.id,
+          setNumber: set.setNumber,
+          reps: set.reps ?? 0,
+          weight: set.weight ?? 0,
+          completed: set.completed ?? (foundWorkout.status === 'completed') // Use actual completed status
+        }))
+      })))
     } else {
       router.push('/workouts')
     }

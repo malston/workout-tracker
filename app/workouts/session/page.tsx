@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useWorkouts } from '@/hooks/useWorkouts'
 import ExerciseTracker from '@/components/ExerciseTracker'
@@ -24,7 +24,7 @@ interface ActiveWorkout {
   exercises: Exercise[]
 }
 
-export default function WorkoutSessionPage() {
+function WorkoutSessionContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const { getWorkout, updateWorkout, loading: workoutsLoading } = useWorkouts()
@@ -131,8 +131,10 @@ export default function WorkoutSessionPage() {
     
     // Update the planned workout to completed status
     try {
-      await updateWorkout(workout.id, {
+      const updateData = {
         status: 'completed',
+        duration: duration,
+        totalVolume: totalVolume,
         exercises: workout.exercises.map((exercise, index) => ({
           id: `exercise-${workout.id}-${index}`,
           exercise: {
@@ -151,9 +153,9 @@ export default function WorkoutSessionPage() {
             notes: null
           }))
         }))
-      })
+      }
       
-      console.log('Successfully updated workout to completed status')
+      await updateWorkout(workout.id, updateData)
     } catch (error) {
       console.error('Failed to update workout status:', error)
     }
@@ -278,5 +280,13 @@ export default function WorkoutSessionPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function WorkoutSessionPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <WorkoutSessionContent />
+    </Suspense>
   )
 }

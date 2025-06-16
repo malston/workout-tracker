@@ -99,12 +99,20 @@ export default function WorkoutCard({ workout }: WorkoutCardProps) {
           </Link>
         </div>
       ) : (
-        <Link 
-          href={`/workouts/${workout.id}`}
-          className="block w-full bg-gray-100 hover:bg-gray-200 text-gray-800 text-center py-2 px-4 rounded-lg font-semibold transition-colors"
-        >
-          View Details
-        </Link>
+        <div className="space-y-2">
+          <Link 
+            href={`/workouts/${workout.id}`}
+            className="block w-full bg-gray-100 hover:bg-gray-200 text-gray-800 text-center py-2 px-4 rounded-lg font-semibold transition-colors"
+          >
+            View Details
+          </Link>
+          <Link
+            href={`/workouts/${workout.id}/edit`}
+            className="block w-full bg-blue-500 hover:bg-blue-600 text-white text-center py-2 px-4 rounded-lg font-semibold transition-colors"
+          >
+            Edit Workout
+          </Link>
+        </div>
       )}
     </div>
   )

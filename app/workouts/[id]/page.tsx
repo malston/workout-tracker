@@ -2,44 +2,27 @@
 
 import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
+import { useWorkouts } from '@/hooks/useWorkouts'
 import Link from 'next/link'
-
-interface Exercise {
-  name: string
-  sets: Array<{
-    reps: number
-    weight: number
-    completed: boolean
-  }>
-}
-
-interface WorkoutDetails {
-  id: string
-  name: string
-  date: string
-  duration: number
-  exercises: Exercise[]
-  totalVolume: number
-}
 
 export default function WorkoutDetailsPage() {
   const params = useParams()
   const router = useRouter()
-  const [workout, setWorkout] = useState<WorkoutDetails | null>(null)
+  const { getWorkout, deleteWorkout: removeWorkout, loading: workoutsLoading } = useWorkouts()
+  const [workout, setWorkout] = useState<any>(null)
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    // Load workout from localStorage
-    const workouts = localStorage.getItem('workouts')
-    if (workouts) {
-      const allWorkouts = JSON.parse(workouts)
-      const foundWorkout = allWorkouts.find((w: WorkoutDetails) => w.id === params.id)
-      if (foundWorkout) {
-        setWorkout(foundWorkout)
-      }
+    if (workoutsLoading) return
+    
+    const workoutId = params.id as string
+    const foundWorkout = getWorkout(workoutId)
+    
+    if (foundWorkout) {
+      setWorkout(foundWorkout)
     }
     setIsLoading(false)
-  }, [params.id])
+  }, [params.id, getWorkout, workoutsLoading])
 
   const formatDuration = (seconds: number) => {
     const hours = Math.floor(seconds / 3600)
@@ -55,12 +38,15 @@ export default function WorkoutDetailsPage() {
     }
   }
 
-  const deleteWorkout = () => {
+  const handleDeleteWorkout = async () => {
     if (confirm('Are you sure you want to delete this workout?')) {
-      const workouts = JSON.parse(localStorage.getItem('workouts') || '[]')
-      const filtered = workouts.filter((w: WorkoutDetails) => w.id !== params.id)
-      localStorage.setItem('workouts', JSON.stringify(filtered))
-      router.push('/workouts')
+      try {
+        await removeWorkout(params.id as string)
+        router.push('/workouts')
+      } catch (error) {
+        console.error('Failed to delete workout:', error)
+        alert('Failed to delete workout. Please try again.')
+      }
     }
   }
 
@@ -101,7 +87,7 @@ export default function WorkoutDetailsPage() {
             ← Back to workouts
           </Link>
           <button
-            onClick={deleteWorkout}
+            onClick={handleDeleteWorkout}
             className="text-red-500 hover:text-red-600 font-medium"
           >
             Delete Workout
@@ -119,19 +105,21 @@ export default function WorkoutDetailsPage() {
           <div className="grid grid-cols-3 gap-4 mt-6">
             <div className="text-center">
               <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                {formatDuration(workout.duration)}
+                {workout.status === 'completed' ? 'Completed' : 'Planned'}
               </p>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Duration</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Status</p>
             </div>
             <div className="text-center">
               <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                {workout.exercises.length}
+                {workout.exercises?.length || 0}
               </p>
               <p className="text-sm text-gray-600 dark:text-gray-400">Exercises</p>
             </div>
             <div className="text-center">
               <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                {workout.totalVolume.toLocaleString()} lbs
+                {workout.exercises?.reduce((total: number, ex: any) => 
+                  total + ex.sets?.reduce((setTotal: number, set: any) => 
+                    setTotal + (set.completed ? (set.weight || 0) * (set.reps || 0) : 0), 0) || 0, 0) || 0} lbs
               </p>
               <p className="text-sm text-gray-600 dark:text-gray-400">Total Volume</p>
             </div>
@@ -139,15 +127,15 @@ export default function WorkoutDetailsPage() {
         </div>
 
         <div className="space-y-4">
-          {workout.exercises.map((exercise, index) => (
-            <div key={index} className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+          {workout.exercises?.map((exerciseItem: any, index: number) => (
+            <div key={exerciseItem.id || index} className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
               <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-                {exercise.name}
+                {exerciseItem.exercise?.name || exerciseItem.name}
               </h3>
               <div className="space-y-2">
-                {exercise.sets.map((set, setIndex) => (
+                {exerciseItem.sets?.map((set: any, setIndex: number) => (
                   <div
-                    key={setIndex}
+                    key={set.id || setIndex}
                     className={`flex items-center justify-between p-3 rounded ${
                       set.completed
                         ? 'bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800'
@@ -155,16 +143,17 @@ export default function WorkoutDetailsPage() {
                     }`}
                   >
                     <span className="font-medium text-gray-700 dark:text-gray-300">
-                      Set {setIndex + 1}
+                      Set {set.setNumber || setIndex + 1}
                     </span>
                     <span className="text-gray-900 dark:text-white">
-                      {set.weight} lbs × {set.reps} reps
+                      {set.weight || 0} lbs × {set.reps || 0} reps
+                      {set.completed && <span className="ml-2 text-green-600">✓</span>}
                     </span>
                   </div>
-                ))}
+                )) || []}
               </div>
             </div>
-          ))}
+          )) || []}
         </div>
       </div>
     </div>
