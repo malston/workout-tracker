@@ -25,6 +25,9 @@ This is a comprehensive Workout Tracker web application built with Next.js 15, f
 - **Offline Support**: Graceful fallback to localStorage when database is unavailable
 - **Pre-built Templates**: 6 workout templates (Push/Pull/Legs/Upper/Lower/Full Body)
 - **Progress Tracking**: Comprehensive progress analytics and statistics
+- **Workout Management**: Full CRUD operations - create, edit, delete, and view workouts
+- **Completed Workout Editing**: Edit finished workouts to correct errors in data
+- **Proper Duration Tracking**: Accurate workout timing from start to finish
 
 ## Development Commands
 
@@ -58,12 +61,15 @@ npm run test:coverage   # Generate coverage report
 workout-tracker/
 ├── app/                    # Next.js app directory
 │   ├── api/               # API routes (exercises, workouts, health)
+│   │   ├── exercises/    # Exercise CRUD endpoints
+│   │   └── workouts/     # Workout CRUD endpoints with [id] routes
 │   ├── exercises/         # Exercise management pages
 │   │   ├── [id]/         # Individual exercise view/edit
 │   │   └── new/          # Create new exercise
 │   ├── workouts/          # Workout tracking pages
-│   │   ├── [id]/         # Individual workout view
-│   │   ├── new/          # Create new workout
+│   │   ├── [id]/         # Individual workout view with deletion
+│   │   │   └── edit/     # Edit completed/planned workouts
+│   │   ├── new/          # Create new workout with templates
 │   │   └── session/      # Live workout tracking
 │   ├── templates/         # Pre-built workout templates
 │   ├── progress/          # Progress tracking and analytics
@@ -88,25 +94,32 @@ workout-tracker/
 
 ### ✅ **Recently Completed Features:**
 
-1. **Next.js 15 Compatibility** (Latest Session)
+1. **Workout Management Enhancements** (Latest Session)
+   - **Fixed workout deletion**: Proper deletion through useWorkouts hook with API support
+   - **Completed workout editing**: Users can now edit completed workouts to fix errors
+   - **Enhanced workout cards**: Added "Edit Workout" buttons to completed workouts
+   - **Improved data storage**: Fixed duration and totalVolume tracking for completed workouts
+   - **TypeScript compilation fixes**: Resolved type mismatches preventing page loading
+
+2. **Next.js 15 Compatibility** (Previous Session)
    - Fixed all TypeScript errors for Next.js 15 async params
    - Updated API routes to handle Promise<{ id: string }> params
    - Fixed Suspense boundary requirements for useSearchParams
    - Application builds successfully with no errors
 
-2. **Complete Application Pages** (Latest Session)
+3. **Complete Application Pages** (Previous Session)
    - `/templates` - 6 pre-built workout templates with modal details
    - `/progress` - Comprehensive progress tracking with statistics
    - `/exercises/[id]` - Exercise detail view with full CRUD operations
    - All navigation links working without 404 errors
 
-3. **Database Architecture** (Previous Sessions)
+4. **Database Architecture** (Previous Sessions)
    - PostgreSQL with Prisma ORM setup
    - All CRUD operations moved to API routes (no browser Prisma usage)
    - Graceful localStorage fallback when database unavailable
    - Health check system for database connectivity
 
-4. **Comprehensive Testing Infrastructure** (Latest Session)
+5. **Comprehensive Testing Infrastructure** (Previous Session)
    - Jest + React Testing Library setup
    - 44 passing tests across utilities, hooks, components, and integration
    - **90%+ test coverage** on critical utilities:
@@ -193,8 +206,9 @@ npm test -- __tests__/utils/  # Test specific directory
 ### **Database & State Management:**
 - `hooks/useDatabase.ts` - Database connection management with health checks
 - `hooks/useExercises.ts` - Exercise CRUD with API routes and localStorage fallback
-- `hooks/useWorkouts.ts` - Workout management with offline capabilities
+- `hooks/useWorkouts.ts` - Workout management with CRUD operations and deletion support
 - `app/api/health/database/route.ts` - Database health check endpoint
+- `app/api/workouts/[id]/route.ts` - Individual workout DELETE and PUT operations
 
 ### **Utility Functions:**
 - `utils/localStorage.ts` - localStorage management with error handling
